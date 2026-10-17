@@ -12,7 +12,13 @@
       <form v-else class="page-form" @submit.prevent="save">
         <ion-input v-model="form.name" label="Store name" label-placement="stacked" required />
         <ion-input v-model="form.address" label="Street address" label-placement="stacked" required />
-        <ion-input :value="municipality || 'Set VITE_MUNICIPALITY_NAME'" label="Municipality" label-placement="stacked" readonly />
+        <ion-input
+          v-model="form.municipality"
+          label="Municipality"
+          label-placement="stacked"
+          autocomplete="address-level2"
+          required
+        />
         <ion-input v-model="form.phone" label="Contact phone" label-placement="stacked" type="tel" />
         <ion-button type="button" fill="outline" :disabled="locating" @click="locate">
           {{ locating ? 'Getting location…' : 'Use my current location' }}
@@ -171,9 +177,10 @@ async function handleImageSelected(event: Event): Promise<void> {
 }
 
 async function save(): Promise<void> {
-  if (!municipality) {
+  const municipalityName = form.municipality.trim();
+  if (!municipalityName) {
     messageColor.value = 'danger';
-    message.value = 'Set VITE_MUNICIPALITY_NAME in .env.local before creating a store.';
+    message.value = 'Enter the municipality where your store is located.';
     return;
   }
   if (!hasLocation.value) {
@@ -190,7 +197,7 @@ async function save(): Promise<void> {
 
   saving.value = true;
   try {
-    await saveOwnerStore(ownerId, { ...form, municipality });
+    await saveOwnerStore(ownerId, { ...form, municipality: municipalityName });
     messageColor.value = 'success';
     message.value = 'Store profile saved.';
     await router.replace('/tabs/owner');

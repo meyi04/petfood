@@ -24,7 +24,7 @@
           <h2>Stores to explore</h2>
           <p class="location">
             <ion-icon :icon="locationOutline" />
-            {{ municipality || 'Local pet stores' }}
+            Browse stores near you
           </p>
         </div>
         <ion-button fill="clear" router-link="/tabs/stores">See all</ion-button>
@@ -70,7 +70,6 @@ import StoreCard from '@/components/StoreCard.vue';
 import { listStores } from '@/services/storeService';
 import type { Store } from '@/types';
 
-const municipality = import.meta.env.VITE_MUNICIPALITY_NAME?.trim() ?? '';
 const stores = ref<Store[]>([]);
 const loading = ref(true);
 const error = ref('');
@@ -84,7 +83,7 @@ function openStore(store: Store): void {
 
 onMounted(async () => {
   try {
-    stores.value = await listStores(municipality || undefined);
+    stores.value = await listStores();
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Could not load stores.';
   } finally {

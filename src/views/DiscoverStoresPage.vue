@@ -7,7 +7,7 @@
       <p class="eyebrow">YOUR NEIGHBORHOOD, YOUR PET'S FAVORITES</p>
       <h1>Find a store</h1>
       <p class="intro">
-        Browse stores{{ municipality ? ` in ${municipality}` : '' }} and explore their products.
+        Browse stores by name, location, or address and explore their products.
       </p>
       <ion-searchbar
         v-model="search"
@@ -60,7 +60,6 @@ import StoreCard from '@/components/StoreCard.vue';
 import { listStores } from '@/services/storeService';
 import type { Store } from '@/types';
 
-const municipality = import.meta.env.VITE_MUNICIPALITY_NAME?.trim() ?? '';
 const router = useRouter();
 const stores = ref<Store[]>([]);
 const search = ref('');
@@ -80,7 +79,7 @@ function openStore(store: Store): void {
 
 onMounted(async () => {
   try {
-    stores.value = await listStores(municipality || undefined);
+    stores.value = await listStores();
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Could not load stores.';
   } finally {
