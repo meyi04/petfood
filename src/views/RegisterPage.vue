@@ -2,7 +2,13 @@
 <template>
   <ion-page>
     <ion-header>
-      <ion-toolbar><ion-title>Create account</ion-title></ion-toolbar>
+      <ion-toolbar>
+        <div class="brand-lockup" slot="start">
+          <img src="/petfood-mark.svg" alt="" />
+          <span>PetFood</span>
+        </div>
+        <ion-title>Create account</ion-title>
+      </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
       <form class="auth-form" @submit.prevent="submit">
@@ -117,6 +123,22 @@ async function submit(): Promise<void> {
 </script>
 
 <style scoped>
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-left: 0.75rem;
+  color: #20463b;
+  font-size: 0.95rem;
+  font-weight: 750;
+}
+
+.brand-lockup img {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 0.55rem;
+}
+
 .auth-form {
   display: grid;
   gap: 1rem;

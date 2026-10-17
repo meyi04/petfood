@@ -3,7 +3,10 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ authStore.profile?.role === 'OWNER' ? 'My pet food store' : 'PetFoodApp' }}</ion-title>
+        <div class="app-brand" slot="start">
+          <img src="/petfood-mark.svg" alt="" />
+          <ion-title>{{ authStore.profile?.role === 'OWNER' ? 'My pet food store' : 'PetFood' }}</ion-title>
+        </div>
         <ion-buttons slot="end">
           <ion-button :disabled="signingOut" @click="logout">
             {{ signingOut ? 'Signing out…' : 'Sign out' }}
@@ -109,3 +112,23 @@ async function logout(): Promise<void> {
   }
 }
 </script>
+
+<style scoped>
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.app-brand img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.65rem;
+}
+
+.app-brand ion-title {
+  position: static;
+  padding: 0;
+  font-size: 1rem;
+}
+</style>
