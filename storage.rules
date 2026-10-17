@@ -1,0 +1,26 @@
+// storage.rules
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isOwner() {
+      return request.auth != null
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'OWNER';
+    }
+
+    function isValidImage() {
+      return request.resource != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
+
+    match /product_images/{imageName} {
+      allow read: if true;
+      allow write: if isOwner() && isValidImage();
+    }
+
+    match /store_images/{imageName} {
+      allow read: if true;
+      allow write: if isOwner() && isValidImage();
+    }
+  }
+}

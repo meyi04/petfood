@@ -1,0 +1,123 @@
+// firestore.rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'OWNER';
+    }
+
+    function ownsStore(storeId) {
+      return isOwner()
+        && get(/databases/$(database)/documents/stores/$(storeId)).data.ownerId == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'role', 'displayName'])
+        && request.resource.data.uid == userId
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.role in ['OWNER', 'BUYER']
+        && request.resource.data.displayName is string;
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']);
+      allow delete: if false;
+    }
+
+    match /stores/{storeId} {
+      allow read: if true;
+      allow create, update: if isOwner()
+        && request.auth.uid == storeId
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          'ownerId', 'name', 'address', 'municipality', 'lat', 'lng', 'phone', 'imageUrl'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.address is string
+        && request.resource.data.municipality is string
+        && request.resource.data.lat is number
+        && request.resource.data.lng is number
+        && request.resource.data.phone is string
+        && request.resource.data.imageUrl is string;
+      allow delete: if isOwner() && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly([
+          'storeId', 'name', 'price', 'description', 'category', 'imageUrl'
+        ])
+        && request.resource.data.storeId is string
+        && ownsStore(request.resource.data.storeId)
+        && request.resource.data.name is string
+        && request.resource.data.price is number
+        && request.resource.data.price > 0
+        && request.resource.data.description is string
+        && request.resource.data.category is string
+        && request.resource.data.imageUrl is string;
+      allow update: if ownsStore(resource.data.storeId)
+        && request.resource.data.storeId == resource.data.storeId
+        && request.resource.data.keys().hasOnly([
+          'storeId', 'name', 'price', 'description', 'category', 'imageUrl'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.price is number
+        && request.resource.data.price > 0
+        && request.resource.data.description is string
+        && request.resource.data.category is string
+        && request.resource.data.imageUrl is string;
+      allow delete: if ownsStore(resource.data.storeId);
+    }
+
+    match /orders/{orderId} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          'buyerId', 'storeId', 'items', 'total', 'status', 'createdAt'
+        ])
+        && request.resource.data.buyerId == request.auth.uid
+        && request.resource.data.storeId is string
+        && exists(/databases/$(database)/documents/stores/$(request.resource.data.storeId))
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 20
+        && request.resource.data.total is number
+        && request.resource.data.total > 0
+        && request.resource.data.status == 'pending';
+      allow read: if signedIn()
+        && (resource.data.buyerId == request.auth.uid || ownsStore(resource.data.storeId));
+      allow update: if signedIn()
+        && ownsStore(resource.data.storeId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status', 'confirmedAt', 'completedAt'
+        ])
+        && (
+          (resource.data.status == 'pending'
+            && request.resource.data.status in ['confirmed', 'cancelled']
+            && (
+              request.resource.data.status == 'cancelled'
+                ? request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+                : request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'confirmedAt'])
+                  && request.resource.data.confirmedAt == request.time
+            ))
+          || (resource.data.status == 'confirmed'
+            && request.resource.data.status == 'cancelled'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']))
+          || (resource.data.status == 'confirmed'
+            && request.resource.data.status == 'completed'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'completedAt'])
+            && request.resource.data.completedAt == request.time)
+        );
+      allow delete: if false;
+    }
+  }
+}

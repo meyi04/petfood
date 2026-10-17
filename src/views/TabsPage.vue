@@ -1,28 +1,111 @@
+<!-- src/views/TabsPage.vue -->
 <template>
   <ion-page>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ authStore.profile?.role === 'OWNER' ? 'My pet food store' : 'PetFoodApp' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button :disabled="signingOut" @click="logout">
+            {{ signingOut ? 'Signing out…' : 'Sign out' }}
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
     <ion-tabs>
-      <ion-router-outlet></ion-router-outlet>
+      <ion-router-outlet />
       <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="tab1" href="/tabs/tab1">
-          <ion-icon aria-hidden="true" :icon="triangle" />
-          <ion-label>Tab 1</ion-label>
-        </ion-tab-button>
-
-        <ion-tab-button tab="tab2" href="/tabs/tab2">
-          <ion-icon aria-hidden="true" :icon="ellipse" />
-          <ion-label>Tab 2</ion-label>
-        </ion-tab-button>
-
-        <ion-tab-button tab="tab3" href="/tabs/tab3">
-          <ion-icon aria-hidden="true" :icon="square" />
-          <ion-label>Tab 3</ion-label>
-        </ion-tab-button>
+        <template v-if="authStore.profile?.role === 'OWNER'">
+          <ion-tab-button tab="owner" href="/tabs/owner">
+            <ion-icon :icon="storefrontOutline" />
+            <ion-label>Dashboard</ion-label>
+          </ion-tab-button>
+          <ion-tab-button tab="manage-store" href="/tabs/manage-store">
+            <ion-icon :icon="businessOutline" />
+            <ion-label>My store</ion-label>
+          </ion-tab-button>
+          <ion-tab-button tab="products" href="/tabs/products">
+            <ion-icon :icon="pricetagsOutline" />
+            <ion-label>Products</ion-label>
+          </ion-tab-button>
+          <ion-tab-button tab="reports" href="/tabs/reports">
+            <ion-icon :icon="barChartOutline" />
+            <ion-label>Reports</ion-label>
+          </ion-tab-button>
+        </template>
+        <template v-else>
+          <ion-tab-button tab="home" href="/tabs/home">
+            <ion-icon :icon="homeOutline" />
+            <ion-label>Home</ion-label>
+          </ion-tab-button>
+          <ion-tab-button tab="stores" href="/tabs/stores">
+            <ion-icon :icon="searchOutline" />
+            <ion-label>Find stores</ion-label>
+          </ion-tab-button>
+          <ion-tab-button tab="orders" href="/tabs/orders">
+            <ion-icon :icon="receiptOutline" />
+            <ion-label>My orders</ion-label>
+          </ion-tab-button>
+          <ion-tab-button tab="account" href="/tabs/account">
+            <ion-icon :icon="personCircleOutline" />
+            <ion-label>Account</ion-label>
+          </ion-tab-button>
+        </template>
       </ion-tab-bar>
     </ion-tabs>
+    <ion-toast
+      :is-open="Boolean(message)"
+      :message="message"
+      duration="3500"
+      color="danger"
+      @did-dismiss="message = ''"
+    />
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage, IonRouterOutlet } from '@ionic/vue';
-import { ellipse, square, triangle } from 'ionicons/icons';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import {
+  IonButton,
+  IonButtons,
+  IonHeader,
+  IonIcon,
+  IonLabel,
+  IonPage,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+  IonTitle,
+  IonToast,
+  IonToolbar,
+} from '@ionic/vue';
+import {
+  businessOutline,
+  barChartOutline,
+  homeOutline,
+  personCircleOutline,
+  pricetagsOutline,
+  receiptOutline,
+  searchOutline,
+  storefrontOutline,
+} from 'ionicons/icons';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
+const router = useRouter();
+const signingOut = ref(false);
+const message = ref('');
+
+async function logout(): Promise<void> {
+  signingOut.value = true;
+  try {
+    await authStore.logout();
+    await router.replace('/login');
+  } catch (cause) {
+    message.value = cause instanceof Error ? cause.message : 'Could not sign out.';
+  } finally {
+    signingOut.value = false;
+  }
+}
 </script>

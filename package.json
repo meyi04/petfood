@@ -12,14 +12,19 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.3",
     "@capacitor/app": "8.1.2",
+    "@capacitor/camera": "^8.2.5",
     "@capacitor/core": "8.5.3",
+    "@capacitor/geolocation": "^8.2.3",
     "@capacitor/haptics": "8.0.2",
     "@capacitor/keyboard": "8.0.6",
     "@capacitor/status-bar": "8.0.4",
     "@ionic/vue": "^9.0.0",
     "@ionic/vue-router": "^9.0.0",
+    "firebase": "^13.0.0",
     "ionicons": "^8.1.0",
+    "pinia": "^4.0.3",
     "vue": "^3.5.0",
     "vue-router": "^5.0.0"
   },
@@ -39,5 +44,8 @@
     "vitest": "~4.0.18",
     "vue-tsc": "^2.1.10"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.5"
+  }
 }

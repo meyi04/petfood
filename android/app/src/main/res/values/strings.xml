@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PetFoodApp</string>
+    <string name="title_activity_main">PetFoodApp</string>
+    <string name="package_name">com.petfoodapp.mobile</string>
+    <string name="custom_url_scheme">com.petfoodapp.mobile</string>
+</resources>
