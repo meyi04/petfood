@@ -8,8 +8,13 @@
           <ion-title>{{ authStore.profile?.role === 'OWNER' ? 'My pet food store' : 'PetFood' }}</ion-title>
         </div>
         <ion-buttons slot="end">
-          <ion-button :disabled="signingOut" @click="logout">
-            {{ signingOut ? 'Signing out…' : 'Sign out' }}
+          <ion-button
+            :disabled="signingOut"
+            :aria-label="signingOut ? 'Signing out' : 'Sign out'"
+            @click="logout"
+          >
+            <ion-spinner v-if="signingOut" name="crescent" />
+            <ion-icon v-else slot="icon-only" :icon="logOutOutline" />
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -76,6 +81,7 @@ import {
   IonLabel,
   IonPage,
   IonRouterOutlet,
+  IonSpinner,
   IonTabBar,
   IonTabButton,
   IonTabs,
@@ -87,6 +93,7 @@ import {
   businessOutline,
   barChartOutline,
   homeOutline,
+  logOutOutline,
   personCircleOutline,
   pricetagsOutline,
   receiptOutline,
