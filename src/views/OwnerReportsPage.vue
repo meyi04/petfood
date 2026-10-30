@@ -268,7 +268,7 @@ h1 {
   padding: 0.6rem;
   border: 1px solid var(--ion-color-light);
   border-radius: 0.75rem;
-  background: white;
+  background: var(--ion-item-background);
   font-size: 0.78rem;
 }
 
@@ -293,7 +293,7 @@ h1 {
 
 .revenue-card {
   border: 0;
-  background: linear-gradient(135deg, #175848, #31866d);
+  background: linear-gradient(135deg, #713723, #b95030);
   color: white;
 }
 
@@ -306,7 +306,7 @@ h1 {
 
 .revenue-card .metric-label,
 .revenue-card .metric-footnote {
-  color: #cbe3d8;
+  color: #f6d6c3;
 }
 
 .metric-card strong {
@@ -364,7 +364,7 @@ h1 {
   height: 2.2rem;
   place-items: center;
   border-radius: 0.7rem;
-  background: #edf4f0;
+  background: var(--app-surface-muted);
   color: var(--ion-color-primary);
   font-size: 0.72rem;
   font-weight: 750;

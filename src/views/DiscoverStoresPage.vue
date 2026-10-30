@@ -7,7 +7,7 @@
       <p class="eyebrow">YOUR NEIGHBORHOOD, YOUR PET'S FAVORITES</p>
       <h1>Find a store</h1>
       <p class="intro">
-        Browse stores by name, location, or address and explore their products.
+        Search PetFood partner stores and public pet food shop listings by name or area.
       </p>
       <ion-searchbar
         v-model="search"
@@ -16,7 +16,7 @@
         class="store-search"
       />
       <div v-if="!loading && !error && stores.length" class="results-heading">
-        <h2>{{ search ? 'Search results' : 'Nearby stores' }}</h2>
+        <h2>{{ search ? 'Search results' : 'Local pet food stores' }}</h2>
         <span>{{ filteredStores.length }} {{ filteredStores.length === 1 ? 'store' : 'stores' }}</span>
       </div>
       <div v-if="loading" class="loading-state"><ion-spinner /></div>
@@ -111,7 +111,9 @@ h1 {
 }
 
 .store-search {
-  --background: #fff;
+  --background: var(--ion-item-background);
+  --color: var(--ion-text-color);
+  --placeholder-color: var(--ion-color-medium);
   --border-radius: 0.9rem;
   --box-shadow: 0 6px 22px rgb(35 51 45 / 5%);
   padding: 0.5rem 0 1rem;

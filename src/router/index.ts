@@ -42,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
         meta: { roles: ['BUYER'] },
       },
       {
+        path: 'nearby',
+        component: () => import('@/views/NearbyStoresPage.vue'),
+        meta: { roles: ['BUYER'] },
+      },
+      {
         path: 'orders',
         component: () => import('@/views/BuyerOrdersPage.vue'),
         meta: { roles: ['BUYER'] },
@@ -54,6 +59,11 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'owner',
         component: () => import('@/views/OwnerDashboard.vue'),
+        meta: { roles: ['OWNER'] },
+      },
+      {
+        path: 'owner-orders',
+        component: () => import('@/views/OwnerOrdersPage.vue'),
         meta: { roles: ['OWNER'] },
       },
       {

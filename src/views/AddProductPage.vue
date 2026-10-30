@@ -243,9 +243,9 @@ onMounted(async () => {
   gap: 0.45rem;
   padding: 1rem;
   overflow: hidden;
-  border: 1px dashed #91b8a9;
+  border: 1px dashed var(--ion-color-primary-tint);
   border-radius: 1rem;
-  background: #f2f7f4;
+  background: var(--app-surface-muted);
   color: var(--ion-color-primary);
   font: inherit;
   cursor: pointer;

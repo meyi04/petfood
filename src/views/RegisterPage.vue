@@ -8,11 +8,16 @@
           <span>PetFood</span>
         </div>
         <ion-title>Create account</ion-title>
+        <ion-buttons slot="end"><ThemeToggleButton /></ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
       <form class="auth-form" @submit.prevent="submit">
-        <h1>Join PetFoodApp</h1>
+        <div class="form-heading">
+          <p class="eyebrow">WELCOME TO PETFOOD</p>
+          <h1>Create your account</h1>
+          <p>Join your local pet community to discover stores and shop essentials.</p>
+        </div>
         <ion-input
           v-model="displayName"
           autocomplete="name"
@@ -73,6 +78,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonInput,
@@ -85,6 +91,7 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 import { useAuthStore } from '@/stores/auth';
+import ThemeToggleButton from '@/components/ThemeToggleButton.vue';
 import type { UserRole } from '@/types';
 
 const displayName = ref('');
@@ -128,7 +135,7 @@ async function submit(): Promise<void> {
   align-items: center;
   gap: 0.5rem;
   padding-left: 0.75rem;
-  color: #20463b;
+  color: var(--ion-color-primary);
   font-size: 0.95rem;
   font-weight: 750;
 }
@@ -142,7 +149,38 @@ async function submit(): Promise<void> {
 .auth-form {
   display: grid;
   gap: 1rem;
+  width: 100%;
   max-width: 30rem;
-  margin: 8vh auto 0;
+  padding: clamp(1.25rem, 5vw, 2rem);
+  margin: clamp(2rem, 8vh, 5rem) auto;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 1.2rem;
+  background: var(--ion-card-background);
+  box-shadow: var(--app-shadow-raised);
+}
+
+.form-heading {
+  margin-bottom: 0.5rem;
+}
+
+.form-heading .eyebrow {
+  margin: 0 0 0.4rem;
+  color: var(--ion-color-primary);
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+.form-heading h1 {
+  margin: 0;
+  font-size: clamp(1.65rem, 6vw, 2rem);
+  letter-spacing: -0.045em;
+}
+
+.form-heading > p:last-child {
+  margin: 0.5rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 </style>

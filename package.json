@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test:e2e": "cypress run",
     "test:unit": "vitest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "seed:stores": "node scripts/seed-directory-stores.js"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
@@ -37,6 +38,7 @@
     "cypress": "^13.5.0",
     "eslint": "^8.35.0",
     "eslint-plugin-vue": "^9.9.0",
+    "firebase-admin": "^13.10.0",
     "jsdom": "^22.1.0",
     "terser": "^5.16.0",
     "typescript": "~5.9.0",

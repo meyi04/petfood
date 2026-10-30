@@ -22,7 +22,9 @@
             <ion-icon :icon="storefrontOutline" aria-hidden="true" />
           </div>
           <div class="store-hero-content">
-            <p class="store-hero-eyebrow">LOCAL PET STORE</p>
+            <p class="store-hero-eyebrow">
+              {{ store.directoryOnly ? 'PUBLIC STORE LISTING · NOT A PETFOOD PARTNER' : 'LOCAL PETFOOD PARTNER' }}
+            </p>
             <h1>{{ store.name }}</h1>
             <p class="store-hero-address">
               <ion-icon :icon="locationOutline" />
@@ -51,29 +53,47 @@
             />
           </div>
           <p class="map-address">{{ store.address }}, {{ store.municipality }}</p>
+          <a
+            v-if="store.directoryOnly && store.sourceUrl"
+            class="source-link"
+            :href="store.sourceUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View the public listing
+          </a>
         </section>
 
-        <div class="section-heading products-heading">
-          <div>
-            <p class="section-eyebrow">SHOP THE SELECTION</p>
-            <h2>Products</h2>
+        <section v-if="store.directoryOnly" class="directory-note">
+          <ion-icon :icon="informationCircleOutline" />
+          <p>
+            This public listing is included for discovery. The store has not joined PetFood,
+            so products and in-app ordering are not available.
+          </p>
+        </section>
+        <template v-else>
+          <div class="section-heading products-heading">
+            <div>
+              <p class="section-eyebrow">SHOP THE SELECTION</p>
+              <h2>Products</h2>
+            </div>
           </div>
-        </div>
-        <ion-select v-model="category" label="Filter by category" interface="popover">
-          <ion-select-option value="">All categories</ion-select-option>
-          <ion-select-option v-for="item in PRODUCT_CATEGORIES" :key="item" :value="item">
-            {{ item }}
-          </ion-select-option>
-        </ion-select>
-        <ion-searchbar v-model="search" placeholder="Search products" />
-        <ion-spinner v-if="productsLoading" />
-        <ion-text v-else-if="!filteredProducts.length"><p>No products in this category.</p></ion-text>
-        <ProductCard
-          v-for="product in filteredProducts"
-          :key="product.id"
-          :product="product"
-          @select="openProduct"
-        />
+          <ion-select v-model="category" label="Filter by category" interface="popover">
+            <ion-select-option value="">All categories</ion-select-option>
+            <ion-select-option v-for="item in PRODUCT_CATEGORIES" :key="item" :value="item">
+              {{ item }}
+            </ion-select-option>
+          </ion-select>
+          <ion-searchbar v-model="search" placeholder="Search products" />
+          <ion-spinner v-if="productsLoading" />
+          <ion-text v-else-if="!filteredProducts.length"><p>No products in this category.</p></ion-text>
+          <ProductCard
+            v-for="product in filteredProducts"
+            :key="product.id"
+            :product="product"
+            @select="openProduct"
+          />
+        </template>
       </template>
     </ion-content>
   </ion-page>
@@ -97,7 +117,12 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/vue';
-import { callOutline, locationOutline, storefrontOutline } from 'ionicons/icons';
+import {
+  callOutline,
+  informationCircleOutline,
+  locationOutline,
+  storefrontOutline,
+} from 'ionicons/icons';
 import ProductCard from '@/components/ProductCard.vue';
 import { getStore, listProducts } from '@/services/storeService';
 import { PRODUCT_CATEGORIES, type Product, type Store } from '@/types';
@@ -157,13 +182,13 @@ onMounted(async () => {
   padding: 1.25rem;
   margin: 0.25rem 0 1.5rem;
   border-radius: 1.2rem;
-  background: linear-gradient(120deg, #174f45, #257c66 68%, #46977d);
+  background: linear-gradient(120deg, #713723, #a94a2e 68%, #ce7953);
   color: white;
   box-shadow: 0 14px 28px rgb(23 79 69 / 16%);
 }
 
 .store-hero.has-photo {
-  background: #174f45;
+  background: #713723;
 }
 
 .store-hero-image,
@@ -180,7 +205,7 @@ onMounted(async () => {
 }
 
 .store-hero.has-photo::before {
-  background: linear-gradient(0deg, rgb(16 53 45 / 94%), rgb(20 68 56 / 52%) 60%, rgb(20 68 56 / 14%));
+  background: linear-gradient(0deg, rgb(47 24 16 / 94%), rgb(71 34 21 / 52%) 60%, rgb(71 34 21 / 14%));
   content: "";
 }
 
@@ -193,7 +218,7 @@ onMounted(async () => {
 .store-hero-eyebrow,
 .section-eyebrow {
   margin: 0 0 0.35rem;
-  color: #c2e4d5;
+  color: #f6d6c3;
   font-size: 0.64rem;
   font-weight: 750;
   letter-spacing: 0.09em;
@@ -212,7 +237,7 @@ onMounted(async () => {
   align-items: flex-start;
   gap: 0.4rem;
   margin: 0.35rem 0 0;
-  color: #e1f0e9;
+  color: #fff0e7;
   font-size: 0.84rem;
   line-height: 1.45;
   text-decoration: none;
@@ -286,6 +311,39 @@ onMounted(async () => {
   margin: 0.55rem 0 0;
   color: var(--ion-color-medium);
   font-size: 0.85rem;
+}
+
+.source-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: var(--ion-color-primary);
+  font-size: 0.85rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.directory-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 1rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 0.9rem;
+  background: var(--ion-item-background);
+  color: var(--ion-color-medium);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.directory-note ion-icon {
+  flex: none;
+  margin-top: 0.1rem;
+  color: var(--ion-color-primary);
+  font-size: 1.2rem;
+}
+
+.directory-note p {
+  margin: 0;
 }
 
 @media (max-width: 480px) {

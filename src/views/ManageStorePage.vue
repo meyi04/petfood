@@ -260,14 +260,14 @@ onMounted(async () => {
   min-height: 13rem;
   place-items: center;
   overflow: hidden;
-  border: 1px dashed #91b8a9;
+  border: 1px dashed var(--ion-color-primary-tint);
   border-radius: 1rem;
-  background: linear-gradient(135deg, #e8f3ee, #f5eee2);
+  background: linear-gradient(135deg, var(--app-surface-muted), var(--ion-card-background));
 }
 
 .photo-preview.has-photo {
   border-style: solid;
-  background: #e8eeeb;
+  background: var(--app-surface-muted);
 }
 
 .photo-preview > img {
@@ -300,7 +300,7 @@ onMounted(async () => {
   right: 0.75rem;
   bottom: 0.75rem;
   margin: 0;
-  --background: white;
+  --background: var(--ion-card-background);
   --color: var(--ion-color-primary);
   --border-radius: 0.75rem;
   box-shadow: 0 4px 16px rgb(35 51 45 / 16%);

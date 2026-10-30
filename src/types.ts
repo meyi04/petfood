@@ -10,9 +10,28 @@ export interface UserProfile {
   displayName: string;
 }
 
+export interface DeliveryAddressDetails {
+  label: string;
+  recipientName: string;
+  phone: string;
+  streetAddress: string;
+  barangay: string;
+  municipality: string;
+  province: string;
+  postalCode: string;
+  deliveryInstructions: string;
+}
+
+export interface DeliveryAddress extends DeliveryAddressDetails {
+  id: string;
+  isDefault: boolean;
+}
+
 export interface Store {
   id: string;
   ownerId: string;
+  directoryOnly?: boolean;
+  sourceUrl?: string;
   name: string;
   address: string;
   municipality: string;
@@ -47,6 +66,7 @@ export interface PetFoodOrder {
   storeId: string;
   items: OrderItem[];
   total: number;
+  deliveryAddress?: DeliveryAddressDetails;
   status: OrderStatus;
   createdAt: Timestamp;
   confirmedAt?: Timestamp;

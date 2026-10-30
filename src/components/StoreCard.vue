@@ -4,7 +4,7 @@
     <div class="store-cover">
       <img v-if="store.imageUrl" :src="store.imageUrl" :alt="store.name" />
       <ion-icon v-else :icon="storefrontOutline" aria-hidden="true" />
-      <span class="cover-label">PET STORE</span>
+      <span class="cover-label">{{ store.directoryOnly ? 'LOCAL LISTING' : 'PETFOOD PARTNER' }}</span>
     </div>
     <ion-card-content class="store-content">
       <div class="store-heading">
@@ -18,6 +18,22 @@
         <ion-icon class="open-icon" :icon="arrowForwardOutline" aria-hidden="true" />
       </div>
       <p class="store-address">{{ store.address }}</p>
+      <div v-if="distanceKm !== undefined && distanceKm !== null" class="store-meta">
+        <span class="store-distance">
+          <ion-icon :icon="navigateOutline" />
+          {{ distanceKm < 1 ? `${Math.round(distanceKm * 1000)} m away` : `${distanceKm.toFixed(1)} km away` }}
+        </span>
+        <a
+          class="directions-link"
+          :href="directionsUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          :aria-label="`Get directions to ${store.name}`"
+          @click.stop
+        >
+          Directions
+        </a>
+      </div>
       <a
         v-if="store.phone"
         class="store-phone"
@@ -32,6 +48,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import {
   IonIcon,
   IonCard,
@@ -39,11 +56,21 @@ import {
   IonCardSubtitle,
   IonCardTitle,
 } from '@ionic/vue';
-import { arrowForwardOutline, callOutline, locationOutline, storefrontOutline } from 'ionicons/icons';
+import {
+  arrowForwardOutline,
+  callOutline,
+  locationOutline,
+  navigateOutline,
+  storefrontOutline,
+} from 'ionicons/icons';
 import type { Store } from '@/types';
 
-defineProps<{ store: Store }>();
+const props = defineProps<{ store: Store; distanceKm?: number | null }>();
 defineEmits<{ select: [store: Store] }>();
+
+const directionsUrl = computed(() =>
+  `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${props.store.lat},${props.store.lng}`)}`,
+);
 </script>
 
 <style scoped>
@@ -63,7 +90,7 @@ defineEmits<{ select: [store: Store] }>();
   height: 9rem;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #d8ece4, #f5e8d7);
+  background: linear-gradient(135deg, #f5e1d4, #f8edcf);
 }
 
 .store-cover img {
@@ -73,7 +100,7 @@ defineEmits<{ select: [store: Store] }>();
 }
 
 .store-cover > ion-icon {
-  color: #398b76;
+  color: #b95030;
   font-size: 3.5rem;
   opacity: 0.82;
 }
@@ -86,7 +113,7 @@ defineEmits<{ select: [store: Store] }>();
   border: 1px solid rgb(255 255 255 / 50%);
   border-radius: 999px;
   background: rgb(255 255 255 / 86%);
-  color: #275e50;
+  color: #7e3c28;
   font-size: 0.62rem;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -129,9 +156,32 @@ defineEmits<{ select: [store: Store] }>();
 
 .store-address {
   margin: 0.8rem 0 0;
-  color: #65736d;
+  color: var(--ion-color-medium);
   font-size: 0.9rem;
   line-height: 1.45;
+}
+
+.store-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.7rem;
+  font-size: 0.84rem;
+}
+
+.store-distance {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ion-color-success);
+  font-weight: 650;
+}
+
+.directions-link {
+  color: var(--ion-color-primary);
+  font-weight: 650;
+  text-decoration: none;
 }
 
 .store-phone {

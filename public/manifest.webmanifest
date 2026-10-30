@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "PetFood",
+  "short_name": "PetFood",
+  "description": "Find pet food, shop local stores, and manage your orders.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff8ee",
+  "theme_color": "#197b68",
+  "icons": [
+    {
+      "src": "/petfood-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/petfood-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

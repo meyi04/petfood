@@ -16,6 +16,35 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/stores/$(storeId)).data.ownerId == request.auth.uid;
     }
 
+    function ownsBuyerProfile(userId) {
+      return signedIn()
+        && request.auth.uid == userId
+        && get(/databases/$(database)/documents/users/$(userId)).data.role == 'BUYER';
+    }
+
+    function validDeliveryAddress(address) {
+      return address is map
+        && address.keys().hasAll([
+          'label', 'recipientName', 'phone', 'streetAddress', 'barangay',
+          'municipality', 'province', 'postalCode', 'deliveryInstructions'
+        ])
+        && address.keys().hasOnly([
+          'label', 'recipientName', 'phone', 'streetAddress', 'barangay',
+          'municipality', 'province', 'postalCode', 'deliveryInstructions', 'isDefault'
+        ])
+        && address.label is string && address.label.size() > 0 && address.label.size() <= 32
+        && address.recipientName is string && address.recipientName.size() > 0 && address.recipientName.size() <= 100
+        && address.phone is string && address.phone.size() > 0 && address.phone.size() <= 32
+        && address.streetAddress is string && address.streetAddress.size() > 0 && address.streetAddress.size() <= 200
+        && address.barangay is string && address.barangay.size() > 0 && address.barangay.size() <= 100
+        && address.municipality is string && address.municipality.size() > 0 && address.municipality.size() <= 100
+        && address.province is string && address.province.size() > 0 && address.province.size() <= 100
+        && address.postalCode is string && address.postalCode.size() <= 16
+        && address.deliveryInstructions is string
+        && address.deliveryInstructions.size() <= 300
+        && (!address.keys().hasAny(['isDefault']) || address.isDefault is bool);
+    }
+
     match /users/{userId} {
       allow create: if signedIn()
         && request.auth.uid == userId
@@ -32,6 +61,12 @@ service cloud.firestore {
         && request.resource.data.role == resource.data.role
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']);
       allow delete: if false;
+
+      match /deliveryAddresses/{addressId} {
+        allow read, delete: if ownsBuyerProfile(userId);
+        allow create, update: if ownsBuyerProfile(userId)
+          && validDeliveryAddress(request.resource.data);
+      }
     }
 
     match /stores/{storeId} {
@@ -50,6 +85,11 @@ service cloud.firestore {
         && request.resource.data.phone is string
         && request.resource.data.imageUrl is string;
       allow delete: if isOwner() && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /directoryStores/{storeId} {
+      allow read: if true;
+      allow write: if false;
     }
 
     match /products/{productId} {
@@ -82,7 +122,7 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly([
-          'buyerId', 'storeId', 'items', 'total', 'status', 'createdAt'
+          'buyerId', 'storeId', 'items', 'total', 'status', 'createdAt', 'deliveryAddress'
         ])
         && request.resource.data.buyerId == request.auth.uid
         && request.resource.data.storeId is string
@@ -92,7 +132,8 @@ service cloud.firestore {
         && request.resource.data.items.size() <= 20
         && request.resource.data.total is number
         && request.resource.data.total > 0
-        && request.resource.data.status == 'pending';
+        && request.resource.data.status == 'pending'
+        && validDeliveryAddress(request.resource.data.deliveryAddress);
       allow read: if signedIn()
         && (resource.data.buyerId == request.auth.uid || ownsStore(resource.data.storeId));
       allow update: if signedIn()

@@ -46,6 +46,11 @@
                 <span class="item-quantity">× {{ item.quantity }}</span>
               </li>
             </ul>
+            <section v-if="order.deliveryAddress" class="delivery-address">
+              <span class="delivery-label">DELIVERING TO · {{ order.deliveryAddress.label }}</span>
+              <strong>{{ order.deliveryAddress.recipientName }} · {{ order.deliveryAddress.phone }}</strong>
+              <p>{{ formatDeliveryAddress(order.deliveryAddress) }}</p>
+            </section>
             <div class="order-footer">
               <div>
                 <span class="total-label">ORDER TOTAL</span>
@@ -96,6 +101,7 @@ import {
   storefrontOutline,
 } from 'ionicons/icons';
 import { listBuyerOrders } from '@/services/orderService';
+import { formatDeliveryAddress } from '@/services/addressService';
 import { getStore } from '@/services/storeService';
 import { useAuthStore } from '@/stores/auth';
 import { formatCurrency } from '@/utils/format';
@@ -229,7 +235,7 @@ h1 {
   height: 2.65rem;
   place-items: center;
   border-radius: 0.85rem;
-  background: #e8f3ee;
+  background: var(--app-surface-muted);
   color: var(--ion-color-primary);
   font-size: 1.25rem;
 }
@@ -264,6 +270,30 @@ h1 {
   line-height: 1.4;
 }
 
+.delivery-address {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.8rem;
+  margin-top: 0.8rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 0.8rem;
+  background: var(--app-surface-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.delivery-label {
+  color: var(--ion-color-primary);
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+}
+
+.delivery-address p {
+  margin: 0;
+  color: var(--ion-color-medium);
+}
+
 .item-quantity,
 .total-label {
   color: var(--ion-color-medium);
@@ -295,8 +325,8 @@ h1 {
   padding: 0.65rem 0.75rem;
   margin-top: 0.65rem;
   border-radius: 0.65rem;
-  background: #f3f6f4;
-  color: #65736d;
+  background: var(--app-surface-muted);
+  color: var(--ion-color-medium);
   font-size: 0.8rem;
 }
 

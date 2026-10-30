@@ -1,0 +1,82 @@
+[
+  {
+    "id": "homie-pet-corner-victoria",
+    "name": "Homie Pet Corner Pet & Poultry Supply",
+    "address": "Calapan South Road, Malayas",
+    "municipality": "Victoria",
+    "lat": 13.1701563,
+    "lng": 121.2785765,
+    "phone": "",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Homie%20Pet%20Corner%20Pet%20%26%20Poultry%20Supply%2C%20Victoria%2C%20Oriental%20Mindoro"
+  },
+  {
+    "id": "pigrolac-store-naujan",
+    "name": "PIGROLAC Store",
+    "address": "Calapan South Road, Pinagsabangan II",
+    "municipality": "Naujan",
+    "lat": 13.2636157,
+    "lng": 121.264695,
+    "phone": "",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=PIGROLAC%20Store%2C%20Oriental%20Mindoro"
+  },
+  {
+    "id": "rem-pet-supplies-calapan",
+    "name": "Rem's Pet Supplies and Accessories Shop",
+    "address": "J. P. Rizal Street",
+    "municipality": "Calapan",
+    "lat": 13.4096887,
+    "lng": 121.1788676,
+    "phone": "09166322586",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Rem%27s%20Pet%20Supplies%20and%20Accessories%20Shop%2C%20Calapan%2C%20Oriental%20Mindoro"
+  },
+  {
+    "id": "calapan-pet-store",
+    "name": "Calapan Pet Store",
+    "address": "Aboboto",
+    "municipality": "Calapan",
+    "lat": 13.411153,
+    "lng": 121.180206,
+    "phone": "09335119847",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Calapan%20Pet%20Store%2C%20Calapan%2C%20Oriental%20Mindoro"
+  },
+  {
+    "id": "dragon-petshop-center-calapan",
+    "name": "Dragon Petshop Center and Agri Supply",
+    "address": "J. P. Rizal Street, Santa Isabel",
+    "municipality": "Calapan",
+    "lat": 13.3773682,
+    "lng": 121.1642639,
+    "phone": "",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Dragon%20Petshop%20Center%20and%20Agri%20Supply%2C%20Calapan%2C%20Oriental%20Mindoro"
+  },
+  {
+    "id": "homie-pet-corner-calapan",
+    "name": "Homie Pet Corner",
+    "address": "J. P. Rizal Street, Masipit",
+    "municipality": "Calapan",
+    "lat": 13.3916642,
+    "lng": 121.1660957,
+    "phone": "",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Homie%20Pet%20Corner%2C%20Calapan%2C%20Oriental%20Mindoro"
+  },
+  {
+    "id": "woof-n-wuff-calapan",
+    "name": "Woof N' Wuff Pet Corner - Calapan",
+    "address": "089 Ramirez",
+    "municipality": "Calapan",
+    "lat": 13.4115403,
+    "lng": 121.1787289,
+    "phone": "09985474423",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Woof%20N%27%20Wuff%20Pet%20Corner%2C%20Calapan%2C%20Oriental%20Mindoro"
+  },
+  {
+    "id": "eggcellent-backyard-pinamalayan",
+    "name": "Eggcellent Backyard",
+    "address": "Anoling",
+    "municipality": "Pinamalayan",
+    "lat": 13.0640953,
+    "lng": 121.4438003,
+    "phone": "09638976262",
+    "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Eggcellent%20Backyard%2C%20Oriental%20Mindoro"
+  }
+]

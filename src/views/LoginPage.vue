@@ -7,6 +7,7 @@
           <img src="/petfood-mark.svg" alt="" />
           <span>PetFood</span>
         </div>
+        <ion-buttons slot="end"><ThemeToggleButton /></ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="login-content">
@@ -102,6 +103,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -119,6 +121,7 @@ import {
   shieldCheckmarkOutline,
 } from 'ionicons/icons';
 import { useAuthStore } from '@/stores/auth';
+import ThemeToggleButton from '@/components/ThemeToggleButton.vue';
 
 const email = ref('');
 const password = ref('');
@@ -143,7 +146,7 @@ async function submit(): Promise<void> {
 
 <style scoped>
 .login-content {
-  --background: #f5f8f5;
+  --background: var(--ion-background-color);
 }
 
 .brand-lockup,
@@ -176,7 +179,7 @@ async function submit(): Promise<void> {
   margin: 1rem auto;
   border: 1px solid rgb(35 51 45 / 6%);
   border-radius: 1.5rem;
-  background: white;
+  background: var(--ion-card-background);
   box-shadow: 0 20px 60px rgb(35 51 45 / 8%);
 }
 
@@ -187,7 +190,7 @@ async function submit(): Promise<void> {
   flex-direction: column;
   overflow: hidden;
   padding: clamp(1.5rem, 4vw, 3rem);
-  background: linear-gradient(145deg, #174f45, #257c66 68%, #46977d);
+  background: linear-gradient(145deg, #713723, #a94a2e 68%, #ce7953);
   color: white;
 }
 
@@ -219,7 +222,7 @@ async function submit(): Promise<void> {
 }
 
 .welcome-copy .eyebrow {
-  color: #c2e4d5;
+  color: #f6d6c3;
 }
 
 .welcome-copy h1 {
@@ -232,7 +235,7 @@ async function submit(): Promise<void> {
 
 .welcome-copy > p:last-child {
   max-width: 22rem;
-  color: #e1f0e9;
+  color: #fff0e7;
   line-height: 1.65;
 }
 
@@ -249,7 +252,7 @@ async function submit(): Promise<void> {
   position: relative;
   z-index: 1;
   margin: 0;
-  color: #d0e8dc;
+  color: #f4d8c8;
   font-size: 0.8rem;
 }
 
@@ -274,26 +277,26 @@ async function submit(): Promise<void> {
 
 .form-heading h2 {
   margin: 0;
-  color: #23332d;
+  color: var(--ion-text-color);
   font-size: clamp(1.5rem, 4vw, 1.9rem);
   letter-spacing: -0.045em;
 }
 
 .form-heading > p:last-child {
   margin: 0.5rem 0 0;
-  color: #78857f;
+  color: var(--ion-color-medium);
   font-size: 0.9rem;
 }
 
 .auth-input {
-  --background: #f9fbf9;
-  --border-color: #e0e8e3;
+  --background: var(--ion-item-background);
+  --border-color: var(--ion-border-color);
   --border-radius: 0.85rem;
   --highlight-color-focused: var(--ion-color-primary);
   --padding-start: 0.85rem;
   --padding-end: 0.55rem;
   min-height: 3.7rem;
-  border: 1px solid #e0e8e3;
+  border: 1px solid var(--ion-border-color);
   border-radius: 0.85rem;
 }
 

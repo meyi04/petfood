@@ -102,7 +102,7 @@ onMounted(async () => {
   padding: 1.5rem;
   margin: 0.35rem 0 2rem;
   border-radius: 1.4rem;
-  background: linear-gradient(115deg, #174f45, #257c66 62%, #46977d);
+  background: linear-gradient(115deg, #713723, #a94a2e 62%, #ce7953);
   color: white;
   box-shadow: 0 16px 32px rgb(23 79 69 / 18%);
 }
@@ -115,7 +115,7 @@ onMounted(async () => {
 
 .welcome .eyebrow {
   margin: 0;
-  color: #c2e4d5;
+  color: #f6d6c3;
   font-size: 0.68rem;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -132,14 +132,14 @@ onMounted(async () => {
 .welcome p:not(.eyebrow) {
   max-width: 16rem;
   margin: 0 0 1rem;
-  color: #e1f0e9;
+  color: #fff0e7;
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
 .welcome ion-button {
-  --background: #fff;
-  --color: #185b4d;
+  --background: #fffdf9;
+  --color: #8e3f27;
   --border-radius: 0.75rem;
   margin: 0;
 }

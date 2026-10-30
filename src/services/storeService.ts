@@ -21,6 +21,8 @@ function toStore(id: string, data: Record<string, unknown>): Store {
   return {
     id,
     ownerId: String(data.ownerId ?? ''),
+    directoryOnly: data.directoryOnly === true,
+    sourceUrl: typeof data.sourceUrl === 'string' ? data.sourceUrl : '',
     name: String(data.name ?? ''),
     address: String(data.address ?? ''),
     municipality: String(data.municipality ?? ''),
@@ -47,13 +49,27 @@ export async function listStores(municipality?: string): Promise<Store[]> {
   const storesQuery = municipality
     ? query(collection(db, 'stores'), where('municipality', '==', municipality))
     : collection(db, 'stores');
-  const result = await getDocs(storesQuery);
-  return result.docs.map((snapshot) => toStore(snapshot.id, snapshot.data()));
+  const [partnerResult, directoryResult] = await Promise.all([
+    getDocs(storesQuery),
+    getDocs(collection(db, 'directoryStores')),
+  ]);
+  const directoryStores = directoryResult.docs
+    .map((snapshot) => toStore(snapshot.id, snapshot.data()))
+    .filter((store) => !municipality || store.municipality.toLocaleLowerCase() === municipality.toLocaleLowerCase());
+  return [
+    ...partnerResult.docs.map((snapshot) => toStore(snapshot.id, snapshot.data())),
+    ...directoryStores,
+  ];
 }
 
 export async function getStore(storeId: string): Promise<Store | null> {
-  const snapshot = await getDoc(doc(db, 'stores', storeId));
-  return snapshot.exists() ? toStore(snapshot.id, snapshot.data()) : null;
+  const partnerSnapshot = await getDoc(doc(db, 'stores', storeId));
+  if (partnerSnapshot.exists()) return toStore(partnerSnapshot.id, partnerSnapshot.data());
+
+  const directorySnapshot = await getDoc(doc(db, 'directoryStores', storeId));
+  return directorySnapshot.exists()
+    ? toStore(directorySnapshot.id, directorySnapshot.data())
+    : null;
 }
 
 export async function getOwnerStore(ownerId: string): Promise<Store | null> {
