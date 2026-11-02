@@ -6,8 +6,8 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#fff8ee",
-  "theme_color": "#197b68",
+  "background_color": "#ffffff",
+  "theme_color": "#0344b5",
   "icons": [
     {
       "src": "/petfood-icon-192.png",

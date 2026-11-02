@@ -321,13 +321,13 @@ h1 {
   justify-content: flex-end;
   padding: 1.25rem;
   border-radius: 1.15rem;
-  background: linear-gradient(120deg, #713723, #a94a2e 68%, #ce7953);
+  background: linear-gradient(120deg, var(--app-hero-start), var(--app-hero-end));
   color: white;
-  box-shadow: 0 14px 28px rgb(23 79 69 / 14%);
+  box-shadow: 0 14px 28px rgba(var(--ion-color-primary-rgb), 0.14);
 }
 
 .store-hero.has-photo {
-  background: #713723;
+  background: var(--ion-color-primary-shade);
 }
 
 .store-hero-image,
@@ -344,7 +344,7 @@ h1 {
 }
 
 .store-hero.has-photo::before {
-  background: linear-gradient(90deg, rgb(47 24 16 / 90%), rgb(71 34 21 / 67%) 70%, rgb(71 34 21 / 38%));
+  background: linear-gradient(90deg, rgb(16 27 50 / 90%), rgb(16 27 50 / 67%) 70%, rgb(16 27 50 / 38%));
   content: "";
 }
 
@@ -366,7 +366,7 @@ h1 {
 
 .hero-eyebrow {
   margin: 0;
-  color: #f6d6c3;
+  color: rgba(255, 255, 255, 0.82);
   font-size: 0.62rem;
   font-weight: 750;
   letter-spacing: 0.09em;
@@ -383,7 +383,7 @@ h1 {
   align-items: flex-start;
   gap: 0.35rem;
   margin: 0;
-  color: #fff0e7;
+  color: rgba(255, 255, 255, 0.92);
   font-size: 0.8rem;
   line-height: 1.45;
 }
@@ -442,8 +442,8 @@ h1 {
 }
 
 .pending-card .metric-icon {
-  background: #fbf0d7;
-  color: #a76b12;
+  background: #fff0d6;
+  color: #8b4f00;
 }
 
 .metric-label {
@@ -466,7 +466,7 @@ h1 {
 
 .revenue-card {
   border: 0;
-  background: linear-gradient(135deg, #713723, #b95030);
+  background: linear-gradient(135deg, var(--app-hero-start), var(--app-hero-end));
   color: white;
 }
 
@@ -477,7 +477,7 @@ h1 {
 
 .revenue-card .metric-label,
 .revenue-card .metric-footnote {
-  color: #f6d6c3;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .analytics-card {
@@ -552,7 +552,7 @@ h1 {
 }
 
 .chart-bar.has-sales {
-  background: linear-gradient(180deg, #2b9c84, #197b68);
+  background: linear-gradient(180deg, var(--ion-color-secondary-tint), var(--ion-color-secondary));
 }
 
 .chart-empty {

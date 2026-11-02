@@ -4,7 +4,7 @@
     <ion-header>
       <ion-toolbar>
         <div class="brand-lockup" slot="start">
-          <img src="/petfood-mark.svg" alt="" />
+          <img src="/petfood-logo.svg" alt="" />
           <span>PetFood</span>
         </div>
         <ion-title>Create account</ion-title>

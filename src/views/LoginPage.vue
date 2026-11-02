@@ -4,7 +4,7 @@
     <ion-header>
       <ion-toolbar>
         <div class="brand-lockup" slot="start">
-          <img src="/petfood-mark.svg" alt="" />
+          <img src="/petfood-logo.svg" alt="" />
           <span>PetFood</span>
         </div>
         <ion-buttons slot="end"><ThemeToggleButton /></ion-buttons>
@@ -14,7 +14,7 @@
       <main class="login-layout">
         <section class="welcome-panel">
           <div class="welcome-brand">
-            <img src="/petfood-mark.svg" alt="" />
+            <img src="/petfood-logo.svg" alt="" />
             <span>PetFood</span>
           </div>
           <div class="welcome-copy">
@@ -154,7 +154,7 @@ async function submit(): Promise<void> {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  color: #20463b;
+  color: var(--ion-color-primary);
   font-size: 1.05rem;
   font-weight: 750;
   letter-spacing: -0.03em;
@@ -177,10 +177,10 @@ async function submit(): Promise<void> {
   grid-template-columns: 0.95fr 1.05fr;
   overflow: hidden;
   margin: 1rem auto;
-  border: 1px solid rgb(35 51 45 / 6%);
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.08);
   border-radius: 1.5rem;
   background: var(--ion-card-background);
-  box-shadow: 0 20px 60px rgb(35 51 45 / 8%);
+  box-shadow: 0 20px 60px rgba(var(--ion-color-primary-rgb), 0.08);
 }
 
 .welcome-panel {
@@ -190,7 +190,7 @@ async function submit(): Promise<void> {
   flex-direction: column;
   overflow: hidden;
   padding: clamp(1.5rem, 4vw, 3rem);
-  background: linear-gradient(145deg, #713723, #a94a2e 68%, #ce7953);
+  background: linear-gradient(145deg, var(--app-hero-start), var(--app-hero-end));
   color: white;
 }
 
@@ -222,7 +222,7 @@ async function submit(): Promise<void> {
 }
 
 .welcome-copy .eyebrow {
-  color: #f6d6c3;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .welcome-copy h1 {
@@ -235,7 +235,7 @@ async function submit(): Promise<void> {
 
 .welcome-copy > p:last-child {
   max-width: 22rem;
-  color: #fff0e7;
+  color: rgba(255, 255, 255, 0.92);
   line-height: 1.65;
 }
 
@@ -252,7 +252,7 @@ async function submit(): Promise<void> {
   position: relative;
   z-index: 1;
   margin: 0;
-  color: #f4d8c8;
+  color: rgba(255, 255, 255, 0.82);
   font-size: 0.8rem;
 }
 
@@ -302,26 +302,26 @@ async function submit(): Promise<void> {
 
 .auth-input ion-icon[slot="start"] {
   margin-inline-end: 0.65rem;
-  color: #78857f;
+  color: var(--ion-color-medium);
   font-size: 1.1rem;
 }
 
 .password-toggle {
   height: 2.4rem;
   margin: 0;
-  --color: #78857f;
+  --color: var(--ion-color-medium);
 }
 
 .submit-button {
   min-height: 3.1rem;
   margin-top: 0.3rem;
   --border-radius: 0.85rem;
-  box-shadow: 0 8px 18px rgb(25 123 104 / 18%);
+  box-shadow: 0 8px 18px rgba(var(--ion-color-primary-rgb), 0.18);
 }
 
 .register-prompt {
   margin: 0.25rem 0 0;
-  color: #78857f;
+  color: var(--ion-color-medium);
   font-size: 0.88rem;
   text-align: center;
 }
@@ -338,7 +338,7 @@ async function submit(): Promise<void> {
   justify-content: center;
   gap: 0.4rem;
   margin: 2rem 0 0;
-  color: #78857f;
+  color: var(--ion-color-medium);
   font-size: 0.76rem;
 }
 

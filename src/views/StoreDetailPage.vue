@@ -182,13 +182,13 @@ onMounted(async () => {
   padding: 1.25rem;
   margin: 0.25rem 0 1.5rem;
   border-radius: 1.2rem;
-  background: linear-gradient(120deg, #713723, #a94a2e 68%, #ce7953);
+  background: linear-gradient(120deg, var(--app-hero-start), var(--app-hero-end));
   color: white;
-  box-shadow: 0 14px 28px rgb(23 79 69 / 16%);
+  box-shadow: 0 14px 28px rgba(var(--ion-color-primary-rgb), 0.16);
 }
 
 .store-hero.has-photo {
-  background: #713723;
+  background: var(--ion-color-primary-shade);
 }
 
 .store-hero-image,
@@ -205,7 +205,7 @@ onMounted(async () => {
 }
 
 .store-hero.has-photo::before {
-  background: linear-gradient(0deg, rgb(47 24 16 / 94%), rgb(71 34 21 / 52%) 60%, rgb(71 34 21 / 14%));
+  background: linear-gradient(0deg, rgb(16 27 50 / 94%), rgb(16 27 50 / 52%) 60%, rgb(16 27 50 / 14%));
   content: "";
 }
 
@@ -218,7 +218,7 @@ onMounted(async () => {
 .store-hero-eyebrow,
 .section-eyebrow {
   margin: 0 0 0.35rem;
-  color: #f6d6c3;
+  color: rgba(255, 255, 255, 0.82);
   font-size: 0.64rem;
   font-weight: 750;
   letter-spacing: 0.09em;
@@ -237,7 +237,7 @@ onMounted(async () => {
   align-items: flex-start;
   gap: 0.4rem;
   margin: 0.35rem 0 0;
-  color: #fff0e7;
+  color: rgba(255, 255, 255, 0.92);
   font-size: 0.84rem;
   line-height: 1.45;
   text-decoration: none;
@@ -294,10 +294,10 @@ onMounted(async () => {
   min-height: 15rem;
   max-height: 28rem;
   overflow: hidden;
-  border: 1px solid rgb(35 51 45 / 8%);
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.08);
   border-radius: 1rem;
-  background: #e8eeeb;
-  box-shadow: 0 8px 24px rgb(35 51 45 / 7%);
+  background: var(--app-surface-muted);
+  box-shadow: 0 8px 24px rgba(var(--ion-color-primary-rgb), 0.07);
 }
 
 .map-frame iframe {

@@ -115,7 +115,7 @@ h1 {
   --color: var(--ion-text-color);
   --placeholder-color: var(--ion-color-medium);
   --border-radius: 0.9rem;
-  --box-shadow: 0 6px 22px rgb(35 51 45 / 5%);
+  --box-shadow: 0 6px 22px rgba(var(--ion-color-primary-rgb), 0.05);
   padding: 0.5rem 0 1rem;
 }
 

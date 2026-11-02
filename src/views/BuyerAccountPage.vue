@@ -464,9 +464,9 @@ onMounted(refreshAddresses);
   gap: 1rem;
   padding: 1.25rem;
   margin: 0.35rem 0 1.6rem;
-  border: 1px solid rgb(25 123 104 / 9%);
+  border: 1px solid rgba(var(--ion-color-secondary-rgb), 0.14);
   border-radius: 1.15rem;
-  background: linear-gradient(135deg, #f8e9df, #fbf0d7);
+  background: linear-gradient(135deg, var(--ion-color-light), #e4f6f3);
 }
 
 .profile-heading ion-avatar {
@@ -477,7 +477,7 @@ onMounted(refreshAddresses);
   border: 2px solid var(--ion-card-background);
   background: var(--ion-card-background);
   color: var(--ion-color-primary);
-  box-shadow: 0 4px 12px rgb(35 51 45 / 8%);
+  box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.08);
 }
 
 .profile-heading ion-icon {
@@ -688,7 +688,7 @@ ion-list {
   border: 1px solid var(--ion-border-color);
   border-radius: 1rem;
   background: var(--ion-card-background);
-  box-shadow: 0 6px 20px rgb(35 51 45 / 4%);
+  box-shadow: 0 6px 20px rgba(var(--ion-color-primary-rgb), 0.04);
 }
 
 ion-item ion-icon[slot="start"] {
@@ -696,7 +696,7 @@ ion-item ion-icon[slot="start"] {
 }
 
 ion-item ion-icon[slot="end"] {
-  color: #9aa49f;
+  color: var(--ion-color-medium);
   font-size: 1rem;
 }
 
@@ -713,8 +713,8 @@ ion-item h2 {
   padding: 1rem;
   margin-top: 1.25rem;
   border-radius: 0.9rem;
-  background: #f6e8dd;
-  color: #694b3c;
+  background: var(--app-surface-muted);
+  color: var(--ion-text-color);
   font-size: 0.85rem;
   line-height: 1.5;
 }

@@ -40,7 +40,7 @@ defineEmits<{ select: [product: Product] }>();
   aspect-ratio: 16 / 10;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #f5e1d4, #f8edcf);
+  background: linear-gradient(135deg, var(--ion-color-light), #e4f6f3);
 }
 
 .product-image img {

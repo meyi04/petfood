@@ -293,7 +293,7 @@ h1 {
 
 .revenue-card {
   border: 0;
-  background: linear-gradient(135deg, #713723, #b95030);
+  background: linear-gradient(135deg, var(--app-hero-start), var(--app-hero-end));
   color: white;
 }
 
@@ -306,7 +306,7 @@ h1 {
 
 .revenue-card .metric-label,
 .revenue-card .metric-footnote {
-  color: #f6d6c3;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .metric-card strong {

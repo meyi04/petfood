@@ -90,7 +90,7 @@ const directionsUrl = computed(() =>
   height: 9rem;
   place-items: center;
   overflow: hidden;
-  background: linear-gradient(135deg, #f5e1d4, #f8edcf);
+  background: linear-gradient(135deg, var(--ion-color-light), #e4f6f3);
 }
 
 .store-cover img {
@@ -100,7 +100,7 @@ const directionsUrl = computed(() =>
 }
 
 .store-cover > ion-icon {
-  color: #b95030;
+  color: var(--ion-color-primary);
   font-size: 3.5rem;
   opacity: 0.82;
 }
@@ -113,7 +113,7 @@ const directionsUrl = computed(() =>
   border: 1px solid rgb(255 255 255 / 50%);
   border-radius: 999px;
   background: rgb(255 255 255 / 86%);
-  color: #7e3c28;
+  color: var(--ion-color-primary);
   font-size: 0.62rem;
   font-weight: 750;
   letter-spacing: 0.08em;

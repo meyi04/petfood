@@ -303,7 +303,7 @@ onMounted(async () => {
   --background: var(--ion-card-background);
   --color: var(--ion-color-primary);
   --border-radius: 0.75rem;
-  box-shadow: 0 4px 16px rgb(35 51 45 / 16%);
+  box-shadow: 0 4px 16px rgba(var(--ion-color-primary-rgb), 0.16);
 }
 
 .image-help {

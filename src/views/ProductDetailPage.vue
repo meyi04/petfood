@@ -98,10 +98,19 @@
         </section>
         <ion-button
           expand="block"
+          fill="outline"
+          :disabled="!isValidQuantity || !product"
+          @click="addToCart"
+        >
+          <ion-icon slot="start" :icon="cartOutline" />
+          Add to cart
+        </ion-button>
+        <ion-button
+          expand="block"
           :disabled="ordering || !isValidQuantity || !selectedAddress || addressesLoading || Boolean(addressError)"
           @click="order"
         >
-          {{ ordering ? 'Placing order…' : 'Place order' }}
+          {{ ordering ? 'Placing order…' : 'Order now' }}
         </ion-button>
       </template>
       <ion-toast
@@ -137,7 +146,7 @@ import {
   IonButton,
   onIonViewWillEnter,
 } from '@ionic/vue';
-import { addOutline, locationOutline, removeOutline } from 'ionicons/icons';
+import { addOutline, cartOutline, locationOutline, removeOutline } from 'ionicons/icons';
 import {
   formatDeliveryAddress,
   listDeliveryAddresses,
@@ -145,12 +154,14 @@ import {
 import { getProduct, getStore } from '@/services/storeService';
 import { placeOrder } from '@/services/orderService';
 import { useAuthStore } from '@/stores/auth';
+import { useCartStore } from '@/stores/cart';
 import { formatCurrency } from '@/utils/format';
 import type { DeliveryAddress, Product } from '@/types';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const cart = useCartStore();
 const product = ref<Product | null>(null);
 const deliveryAddresses = ref<DeliveryAddress[]>([]);
 const selectedAddressId = ref('');
@@ -207,6 +218,31 @@ async function loadDeliveryAddresses(): Promise<void> {
 function normalizeQuantity(): void {
   if (!Number.isSafeInteger(quantity.value) || quantity.value < 1) {
     quantity.value = 1;
+  }
+}
+
+function addToCart(): void {
+  if (!product.value || !authStore.profile || !isValidQuantity.value) {
+    messageColor.value = 'danger';
+    message.value = 'Enter a whole-number quantity greater than zero.';
+    normalizeQuantity();
+    return;
+  }
+  try {
+    cart.loadForBuyer(authStore.profile.uid);
+    cart.addItem({
+      productId: product.value.id,
+      storeId: product.value.storeId,
+      name: product.value.name,
+      unitPrice: product.value.price,
+      imageUrl: product.value.imageUrl,
+      quantity: quantity.value,
+    });
+    messageColor.value = 'success';
+    message.value = `${product.value.name} added to your cart.`;
+  } catch (cause) {
+    messageColor.value = 'danger';
+    message.value = cause instanceof Error ? cause.message : 'Could not add this product to your cart.';
   }
 }
 
@@ -337,7 +373,7 @@ onIonViewWillEnter(loadDeliveryAddresses);
   border: 1px solid var(--ion-border-color);
   border-radius: 1rem;
   background: var(--ion-card-background);
-  box-shadow: 0 8px 24px rgb(35 51 45 / 5%);
+  box-shadow: 0 8px 24px rgba(var(--ion-color-primary-rgb), 0.05);
 }
 
 .price-row,

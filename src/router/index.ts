@@ -52,6 +52,11 @@ const routes: Array<RouteRecordRaw> = [
         meta: { roles: ['BUYER'] },
       },
       {
+        path: 'cart',
+        component: () => import('@/views/CartPage.vue'),
+        meta: { roles: ['BUYER'] },
+      },
+      {
         path: 'account',
         component: () => import('@/views/BuyerAccountPage.vue'),
         meta: { roles: ['BUYER'] },

@@ -334,7 +334,7 @@ h1 {
   border: 1px solid var(--ion-border-color);
   border-radius: 1rem;
   background: var(--ion-item-background);
-  box-shadow: 0 8px 24px rgb(35 51 45 / 7%);
+  box-shadow: 0 8px 24px rgba(var(--ion-color-primary-rgb), 0.07);
 }
 
 .map-frame iframe {

@@ -4,7 +4,7 @@
     <ion-header class="app-header">
       <ion-toolbar class="app-toolbar">
         <div class="app-brand" slot="start">
-          <img src="/petfood-mark.svg" alt="" />
+          <img src="/petfood-logo.svg" alt="" />
           <div class="brand-copy">
             <ion-title>{{ authStore.profile?.role === 'OWNER' ? 'My pet food store' : 'PetFood' }}</ion-title>
             <span>{{ authStore.profile?.role === 'OWNER' ? 'OWNER SPACE' : 'PET PARENT' }}</span>
@@ -23,6 +23,19 @@
             <ion-icon slot="icon-only" :icon="notificationsOutline" />
             <ion-badge v-if="unreadOrderCount" color="danger" class="notification-count">
               {{ unreadOrderCount > 99 ? '99+' : unreadOrderCount }}
+            </ion-badge>
+          </ion-button>
+          <ion-button
+            v-if="authStore.profile?.role === 'BUYER'"
+            class="cart-button"
+            :aria-label="cart.itemCount
+              ? `Shopping cart, ${cart.itemCount} item${cart.itemCount === 1 ? '' : 's'}`
+              : 'Shopping cart, empty'"
+            @click="openCart"
+          >
+            <ion-icon slot="icon-only" :icon="cartOutline" />
+            <ion-badge v-if="cart.itemCount" color="danger" class="notification-count">
+              {{ cart.itemCount > 99 ? '99+' : cart.itemCount }}
             </ion-badge>
           </ion-button>
           <ion-button
@@ -177,6 +190,7 @@ import {
 } from '@ionic/vue';
 import {
   arrowForwardOutline,
+  cartOutline,
   closeOutline,
   locationOutline,
   businessOutline,
@@ -193,11 +207,13 @@ import {
 import { getOwnerStore } from '@/services/storeService';
 import { subscribeToStoreOrders } from '@/services/orderService';
 import { useAuthStore } from '@/stores/auth';
+import { useCartStore } from '@/stores/cart';
 import { formatCurrency } from '@/utils/format';
 import type { PetFoodOrder } from '@/types';
 import ThemeToggleButton from '@/components/ThemeToggleButton.vue';
 
 const authStore = useAuthStore();
+const cart = useCartStore();
 const router = useRouter();
 const signingOut = ref(false);
 const message = ref('');
@@ -229,6 +245,10 @@ function formatOrderDate(order: PetFoodOrder): string {
 function openOwnerOrders(): void {
   notificationsOpen.value = false;
   void router.push('/tabs/owner-orders');
+}
+
+function openCart(): void {
+  void router.push('/tabs/cart');
 }
 
 function notificationStorageKey(ownerId: string): string {
@@ -340,6 +360,9 @@ async function logout(): Promise<void> {
 watch(() => router.currentRoute.value.path, () => {
   if (!unsubscribeOrders) void startOrderNotifications();
 });
+watch(() => authStore.profile?.uid, (buyerId) => {
+  if (buyerId && authStore.profile?.role === 'BUYER') cart.loadForBuyer(buyerId);
+}, { immediate: true });
 onMounted(() => { void startOrderNotifications(); });
 onBeforeUnmount(() => {
   componentUnmounted = true;
@@ -349,14 +372,15 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .app-header {
-  box-shadow: 0 4px 18px rgb(35 51 45 / 5%);
+  z-index: 10;
+  box-shadow: 0 2px 12px rgba(var(--ion-color-primary-rgb), 0.06);
 }
 
 .app-toolbar {
   --background: var(--ion-toolbar-background);
   --border-width: 0 0 1px;
   --border-color: var(--ion-border-color);
-  --min-height: 4.5rem;
+  --min-height: 4.25rem;
   --padding-start: 1rem;
   --padding-end: 0.75rem;
 }
@@ -364,14 +388,15 @@ onBeforeUnmount(() => {
 .app-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 
 .app-brand img {
-  width: 2.65rem;
-  height: 2.65rem;
-  border-radius: 0.85rem;
-  box-shadow: 0 3px 10px rgb(25 123 104 / 16%);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.1);
 }
 
 .brand-copy {
@@ -391,31 +416,42 @@ onBeforeUnmount(() => {
 
 .brand-copy span {
   color: var(--ion-color-medium);
-  font-size: 0.62rem;
-  font-weight: 750;
-  letter-spacing: 0.12em;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   line-height: 1;
 }
 
 .signout-button {
-  width: 2.65rem;
-  height: 2.65rem;
+  width: 2.5rem;
+  height: 2.5rem;
   margin: 0;
-  --background: var(--ion-color-light);
+  --background: var(--app-surface-muted);
   --background-hover: var(--ion-color-light-shade);
-  --border-radius: 0.85rem;
-  --color: var(--ion-text-color);
+  --border-radius: 0.75rem;
+  --color: var(--ion-color-medium);
 }
 
 .notification-button {
   position: relative;
-  width: 2.65rem;
-  height: 2.65rem;
+  width: 2.5rem;
+  height: 2.5rem;
   margin: 0;
-  --background: var(--ion-color-light);
+  --background: var(--app-surface-muted);
   --background-hover: var(--ion-color-light-shade);
-  --border-radius: 0.85rem;
-  --color: var(--ion-text-color);
+  --border-radius: 0.75rem;
+  --color: var(--ion-color-medium);
+}
+
+.cart-button {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  --background: var(--app-surface-muted);
+  --background-hover: var(--ion-color-light-shade);
+  --border-radius: 0.75rem;
+  --color: var(--ion-color-primary);
 }
 
 .notification-count {
@@ -432,8 +468,44 @@ onBeforeUnmount(() => {
 }
 
 .notification-button ion-icon,
+.cart-button ion-icon,
 .signout-button ion-icon {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
+}
+
+ion-tab-bar {
+  min-height: 4.25rem;
+  padding: 0.45rem 0 max(0.45rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--ion-border-color);
+  background: var(--ion-tab-bar-background);
+  box-shadow: 0 -4px 18px rgba(var(--ion-color-primary-rgb), 0.06);
+}
+
+ion-tab-button {
+  --color: var(--ion-color-medium);
+  --color-selected: var(--ion-color-primary);
+  --ripple-color: rgba(var(--ion-color-primary-rgb), 0.1);
+  min-height: 3.25rem;
+  margin: 0 0.2rem;
+  border-radius: 0.8rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+ion-tab-button::part(native) {
+  border-radius: 0.8rem;
+}
+
+ion-tab-button ion-icon {
+  margin-bottom: 0.15rem;
+  font-size: 1.25rem;
+}
+
+ion-tab-button.tab-selected {
+  background: rgba(var(--ion-color-primary-rgb), 0.08);
+  font-weight: 700;
 }
 
 .notification-content {
