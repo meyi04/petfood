@@ -46,6 +46,9 @@
                 <span class="item-quantity">× {{ item.quantity }}</span>
               </li>
             </ul>
+            <p v-if="order.fulfillmentType === 'pickup'" class="fulfillment-note">
+              <strong>Pick up:</strong> Collect your order directly from the store.
+            </p>
             <section v-if="order.deliveryAddress" class="delivery-address">
               <span class="delivery-label">DELIVERING TO · {{ order.deliveryAddress.label }}</span>
               <strong>{{ order.deliveryAddress.recipientName }} · {{ order.deliveryAddress.phone }}</strong>
@@ -252,6 +255,15 @@ h1 {
   margin: 0;
   color: var(--ion-color-medium);
   font-size: 0.82rem;
+}
+
+.fulfillment-note {
+  padding: 0.75rem;
+  margin: 0.8rem 0 0;
+  border-radius: 0.75rem;
+  background: var(--app-surface-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 .items {

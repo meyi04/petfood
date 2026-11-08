@@ -132,7 +132,8 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow create: if signedIn()
         && request.resource.data.keys().hasOnly([
-          'buyerId', 'storeId', 'items', 'total', 'status', 'createdAt', 'deliveryAddress'
+          'buyerId', 'storeId', 'items', 'total', 'status', 'createdAt',
+          'fulfillmentType', 'deliveryAddress'
         ])
         && request.resource.data.buyerId == request.auth.uid
         && request.resource.data.storeId is string
@@ -143,7 +144,14 @@ service cloud.firestore {
         && request.resource.data.total is number
         && request.resource.data.total > 0
         && request.resource.data.status == 'pending'
-        && validDeliveryAddress(request.resource.data.deliveryAddress);
+        && request.resource.data.fulfillmentType in ['pickup', 'delivery']
+        && (
+          (request.resource.data.fulfillmentType == 'pickup'
+            && !request.resource.data.keys().hasAny(['deliveryAddress']))
+          || (request.resource.data.fulfillmentType == 'delivery'
+            && request.resource.data.keys().hasAny(['deliveryAddress'])
+            && validDeliveryAddress(request.resource.data.deliveryAddress))
+        );
       allow read: if signedIn()
         && (resource.data.buyerId == request.auth.uid || ownsStore(resource.data.storeId) || isAdmin());
       allow update: if signedIn()

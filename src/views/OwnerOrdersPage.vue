@@ -93,7 +93,14 @@
               </div>
             </section>
 
-            <section v-if="order.deliveryAddress" class="delivery-panel">
+            <section v-if="order.fulfillmentType === 'pickup'" class="delivery-panel">
+              <div class="delivery-heading">
+                <ion-icon :icon="locationOutline" />
+                <strong>Pickup order</strong>
+              </div>
+              <p>The customer will pick up this order from your store.</p>
+            </section>
+            <section v-else-if="order.deliveryAddress" class="delivery-panel">
               <div class="delivery-heading">
                 <ion-icon :icon="locationOutline" />
                 <strong>Deliver to · {{ order.deliveryAddress.label }}</strong>

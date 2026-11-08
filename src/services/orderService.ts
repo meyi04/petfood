@@ -14,6 +14,7 @@ import {
 import { db } from '@/firebase';
 import type {
   DeliveryAddressDetails,
+  FulfillmentType,
   OrderItem,
   OrderStatus,
   PetFoodOrder,
@@ -23,18 +24,25 @@ export async function placeOrder(
   buyerId: string,
   storeId: string,
   items: OrderItem[],
-  deliveryAddress: DeliveryAddressDetails,
+  fulfillmentType: FulfillmentType,
+  deliveryAddress?: DeliveryAddressDetails,
 ): Promise<string> {
   if (items.length === 0) throw new Error('An order must contain at least one item.');
-  if (
-    !deliveryAddress.recipientName.trim() ||
-    !deliveryAddress.phone.trim() ||
-    !deliveryAddress.streetAddress.trim() ||
-    !deliveryAddress.barangay.trim() ||
-    !deliveryAddress.municipality.trim() ||
-    !deliveryAddress.province.trim()
-  ) {
-    throw new Error('A complete delivery address is required to place this order.');
+  if (fulfillmentType !== 'pickup' && fulfillmentType !== 'delivery') {
+    throw new Error('Choose pickup or home delivery for this order.');
+  }
+  if (fulfillmentType === 'delivery') {
+    if (!deliveryAddress) throw new Error('Choose a delivery address to place this order.');
+    if (
+      !deliveryAddress.recipientName.trim() ||
+      !deliveryAddress.phone.trim() ||
+      !deliveryAddress.streetAddress.trim() ||
+      !deliveryAddress.barangay.trim() ||
+      !deliveryAddress.municipality.trim() ||
+      !deliveryAddress.province.trim()
+    ) {
+      throw new Error('A complete delivery address is required to place this order.');
+    }
   }
   for (const item of items) {
     if (!Number.isSafeInteger(item.quantity) || item.quantity <= 0) {
@@ -58,7 +66,8 @@ export async function placeOrder(
     storeId,
     items,
     total,
-    deliveryAddress,
+    fulfillmentType,
+    ...(fulfillmentType === 'delivery' && deliveryAddress ? { deliveryAddress } : {}),
     status: 'pending',
     createdAt: serverTimestamp(),
   });

@@ -16,6 +16,9 @@
         </div>
         <ion-buttons slot="end">
           <ThemeToggleButton />
+          <ion-button aria-label="Refresh app" @click="refreshApp">
+            <ion-icon slot="icon-only" :icon="refreshOutline" />
+          </ion-button>
           <ion-button
             v-if="authStore.profile?.role === 'OWNER'"
             class="notification-button"
@@ -210,6 +213,7 @@ import {
   notificationsOutline,
   personCircleOutline,
   pricetagsOutline,
+  refreshOutline,
   receiptOutline,
   searchOutline,
   storefrontOutline,
@@ -259,6 +263,10 @@ function openOwnerOrders(): void {
 
 function openCart(): void {
   void router.push('/tabs/cart');
+}
+
+function refreshApp(): void {
+  window.location.reload();
 }
 
 function notificationStorageKey(ownerId: string): string {

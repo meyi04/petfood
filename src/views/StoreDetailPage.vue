@@ -5,6 +5,11 @@
       <ion-toolbar>
         <ion-buttons slot="start"><ion-back-button default-href="/tabs/home" /></ion-buttons>
         <ion-title>{{ store?.name ?? 'Store details' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button aria-label="Refresh app" @click="refreshApp">
+            <ion-icon slot="icon-only" :icon="refreshOutline" />
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
@@ -104,6 +109,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
   IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
@@ -121,6 +127,7 @@ import {
   callOutline,
   informationCircleOutline,
   locationOutline,
+  refreshOutline,
   storefrontOutline,
 } from 'ionicons/icons';
 import ProductCard from '@/components/ProductCard.vue';
@@ -154,6 +161,10 @@ const filteredProducts = computed(() =>
 
 function openProduct(product: Product): void {
   void router.push(`/products/${product.id}`);
+}
+
+function refreshApp(): void {
+  window.location.reload();
 }
 
 onMounted(async () => {

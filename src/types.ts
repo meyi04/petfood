@@ -60,6 +60,7 @@ export interface OrderItem {
 }
 
 export type OrderStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
+export type FulfillmentType = 'pickup' | 'delivery';
 
 export interface PetFoodOrder {
   id: string;
@@ -67,6 +68,7 @@ export interface PetFoodOrder {
   storeId: string;
   items: OrderItem[];
   total: number;
+  fulfillmentType?: FulfillmentType;
   deliveryAddress?: DeliveryAddressDetails;
   status: OrderStatus;
   createdAt: Timestamp;

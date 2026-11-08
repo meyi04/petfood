@@ -5,6 +5,11 @@
       <ion-toolbar>
         <ion-buttons slot="start"><ion-back-button default-href="/tabs/home" /></ion-buttons>
         <ion-title>Product details</ion-title>
+        <ion-buttons slot="end">
+          <ion-button aria-label="Refresh app" @click="refreshApp">
+            <ion-icon slot="icon-only" :icon="refreshOutline" />
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding">
@@ -16,6 +21,25 @@
         <ion-chip>{{ product.category }}</ion-chip>
         <p>{{ product.description }}</p>
         <section class="delivery-panel">
+          <div class="delivery-heading">
+            <div>
+              <span class="detail-label">FULFILLMENT</span>
+              <strong>How would you like your order?</strong>
+            </div>
+          </div>
+          <ion-segment v-model="fulfillmentType" aria-label="Order fulfillment">
+            <ion-segment-button value="pickup">
+              <ion-label>Pick up</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="delivery">
+              <ion-label>Delivery</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+          <p v-if="fulfillmentType === 'pickup'" class="fulfillment-note">
+            Pick up your order directly from the store.
+          </p>
+        </section>
+        <section v-if="fulfillmentType === 'delivery'" class="delivery-panel">
           <div class="delivery-heading">
             <div>
               <span class="detail-label">DELIVER TO</span>
@@ -107,7 +131,7 @@
         </ion-button>
         <ion-button
           expand="block"
-          :disabled="ordering || !isValidQuantity || !selectedAddress || addressesLoading || Boolean(addressError)"
+          :disabled="ordering || !isValidQuantity || (fulfillmentType === 'delivery' && (!selectedAddress || addressesLoading || Boolean(addressError)))"
           @click="order"
         >
           {{ ordering ? 'Placing order…' : 'Order now' }}
@@ -134,8 +158,11 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonLabel,
   IonPage,
   IonInput,
+  IonSegment,
+  IonSegmentButton,
   IonSelect,
   IonSelectOption,
   IonSpinner,
@@ -146,7 +173,13 @@ import {
   IonButton,
   onIonViewWillEnter,
 } from '@ionic/vue';
-import { addOutline, cartOutline, locationOutline, removeOutline } from 'ionicons/icons';
+import {
+  addOutline,
+  cartOutline,
+  locationOutline,
+  refreshOutline,
+  removeOutline,
+} from 'ionicons/icons';
 import {
   formatDeliveryAddress,
   listDeliveryAddresses,
@@ -156,12 +189,13 @@ import { placeOrder } from '@/services/orderService';
 import { useAuthStore } from '@/stores/auth';
 import { useCartStore } from '@/stores/cart';
 import { formatCurrency } from '@/utils/format';
-import type { DeliveryAddress, Product } from '@/types';
+import type { DeliveryAddress, FulfillmentType, Product } from '@/types';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const cart = useCartStore();
+const fulfillmentType = ref<FulfillmentType>('delivery');
 const product = ref<Product | null>(null);
 const deliveryAddresses = ref<DeliveryAddress[]>([]);
 const selectedAddressId = ref('');
@@ -187,6 +221,10 @@ const selectedAddress = computed(() =>
 
 function manageAddresses(): void {
   void router.push('/tabs/account');
+}
+
+function refreshApp(): void {
+  window.location.reload();
 }
 
 async function loadDeliveryAddresses(): Promise<void> {
@@ -247,7 +285,12 @@ function addToCart(): void {
 }
 
 async function order(): Promise<void> {
-  if (!product.value || !authStore.profile || !selectedAddress.value) return;
+  const address = fulfillmentType.value === 'delivery' ? selectedAddress.value : null;
+  if (
+    !product.value ||
+    !authStore.profile ||
+    (fulfillmentType.value === 'delivery' && !address)
+  ) return;
   if (!isValidQuantity.value) {
     messageColor.value = 'danger';
     message.value = 'Enter a whole-number quantity greater than zero.';
@@ -263,17 +306,17 @@ async function order(): Promise<void> {
       name: product.value.name,
       quantity: quantity.value,
       unitPrice: product.value.price,
-    }], {
-      label: selectedAddress.value.label,
-      recipientName: selectedAddress.value.recipientName,
-      phone: selectedAddress.value.phone,
-      streetAddress: selectedAddress.value.streetAddress,
-      barangay: selectedAddress.value.barangay,
-      municipality: selectedAddress.value.municipality,
-      province: selectedAddress.value.province,
-      postalCode: selectedAddress.value.postalCode,
-      deliveryInstructions: selectedAddress.value.deliveryInstructions,
-    });
+    }], fulfillmentType.value, address ? {
+      label: address.label,
+      recipientName: address.recipientName,
+      phone: address.phone,
+      streetAddress: address.streetAddress,
+      barangay: address.barangay,
+      municipality: address.municipality,
+      province: address.province,
+      postalCode: address.postalCode,
+      deliveryInstructions: address.deliveryInstructions,
+    } : undefined);
     messageColor.value = 'success';
     message.value = 'Your order was sent to the store.';
   } catch (cause) {
@@ -314,6 +357,12 @@ onIonViewWillEnter(loadDeliveryAddresses);
   justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+.fulfillment-note {
+  margin: 0.65rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
 }
 
 .delivery-heading > div {

@@ -31,6 +31,26 @@
         <section class="delivery-panel">
           <div class="delivery-heading">
             <div>
+              <span class="detail-label">FULFILLMENT</span>
+              <strong>How would you like your order?</strong>
+            </div>
+          </div>
+          <ion-segment v-model="fulfillmentType" aria-label="Order fulfillment">
+            <ion-segment-button value="pickup">
+              <ion-label>Pick up</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="delivery">
+              <ion-label>Delivery</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+          <p v-if="fulfillmentType === 'pickup'" class="fulfillment-note">
+            Pick up your order directly from each store.
+          </p>
+        </section>
+
+        <section v-if="fulfillmentType === 'delivery'" class="delivery-panel">
+          <div class="delivery-heading">
+            <div>
               <span class="detail-label">DELIVER TO</span>
               <strong>Delivery address</strong>
             </div>
@@ -139,7 +159,7 @@
             </ion-text>
             <ion-button
               expand="block"
-              :disabled="Boolean(orderingStoreId) || !selectedAddress || addressesLoading || Boolean(addressError) || !storeNames[group.storeId]"
+              :disabled="Boolean(orderingStoreId) || (fulfillmentType === 'delivery' && (!selectedAddress || addressesLoading || Boolean(addressError))) || !storeNames[group.storeId]"
               @click="placeStoreOrder(group)"
             >
               {{ orderingStoreId === group.storeId ? 'Placing order…' : `Place order · ${formatCurrency(group.total)}` }}
@@ -175,6 +195,9 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
+  IonLabel,
+  IonSegment,
+  IonSegmentButton,
   IonSelect,
   IonSelectOption,
   IonSpinner,
@@ -197,7 +220,12 @@ import { getProduct, getStore } from '@/services/storeService';
 import { useAuthStore } from '@/stores/auth';
 import { useCartStore, type CartItem } from '@/stores/cart';
 import { formatCurrency } from '@/utils/format';
-import type { DeliveryAddress, DeliveryAddressDetails, OrderItem } from '@/types';
+import type {
+  DeliveryAddress,
+  DeliveryAddressDetails,
+  FulfillmentType,
+  OrderItem,
+} from '@/types';
 
 interface CartGroup {
   storeId: string;
@@ -208,6 +236,7 @@ interface CartGroup {
 const router = useRouter();
 const authStore = useAuthStore();
 const cart = useCartStore();
+const fulfillmentType = ref<FulfillmentType>('delivery');
 const addresses = ref<DeliveryAddress[]>([]);
 const selectedAddressId = ref('');
 const addressesLoading = ref(true);
@@ -256,26 +285,37 @@ async function loadCartPage(): Promise<void> {
   storeErrors.value = {};
   try {
     const storeIds = [...new Set(cart.items.map((item) => item.storeId))];
-    const [savedAddresses, stores] = await Promise.all([
+    const [addressResult, storesResult] = await Promise.allSettled([
       listDeliveryAddresses(buyerId),
       Promise.all(storeIds.map((id) => getStore(id))),
     ]);
-    addresses.value = savedAddresses;
-    selectedAddressId.value =
-      savedAddresses.find((address) => address.id === selectedAddressId.value)?.id ??
-      savedAddresses.find((address) => address.isDefault)?.id ??
-      savedAddresses[0]?.id ??
-      '';
-    storeNames.value = Object.fromEntries(stores.flatMap((store) =>
-      store && !store.directoryOnly ? [[store.id, store.name]] : [],
-    ));
-    storeErrors.value = Object.fromEntries(stores.flatMap((store, index) =>
-      !store || store.directoryOnly
-        ? [[storeIds[index], 'This store is no longer available for in-app orders.']]
-        : [],
-    ));
-  } catch (cause) {
-    loadError.value = cause instanceof Error ? cause.message : 'Could not load your cart details.';
+    if (addressResult.status === 'fulfilled') {
+      addresses.value = addressResult.value;
+      selectedAddressId.value =
+        addressResult.value.find((address) => address.id === selectedAddressId.value)?.id ??
+        addressResult.value.find((address) => address.isDefault)?.id ??
+        addressResult.value[0]?.id ??
+        '';
+    } else {
+      addressError.value = addressResult.reason instanceof Error
+        ? addressResult.reason.message
+        : 'Could not load your delivery addresses.';
+    }
+    if (storesResult.status === 'fulfilled') {
+      const stores = storesResult.value;
+      storeNames.value = Object.fromEntries(stores.flatMap((store) =>
+        store && !store.directoryOnly ? [[store.id, store.name]] : [],
+      ));
+      storeErrors.value = Object.fromEntries(stores.flatMap((store, index) =>
+        !store || store.directoryOnly
+          ? [[storeIds[index], 'This store is no longer available for in-app orders.']]
+          : [],
+      ));
+    } else {
+      loadError.value = storesResult.reason instanceof Error
+        ? storesResult.reason.message
+        : 'Could not load your cart details.';
+    }
   } finally {
     addressesLoading.value = false;
   }
@@ -335,8 +375,8 @@ function addressDetails(address: DeliveryAddress): DeliveryAddressDetails {
 
 async function placeStoreOrder(group: CartGroup): Promise<void> {
   const buyerId = authStore.profile?.uid;
-  const address = selectedAddress.value;
-  if (!buyerId || !address || orderingStoreId.value) return;
+  const address = fulfillmentType.value === 'delivery' ? selectedAddress.value : null;
+  if (!buyerId || (fulfillmentType.value === 'delivery' && !address) || orderingStoreId.value) return;
   orderingStoreId.value = group.storeId;
   storeErrors.value = { ...storeErrors.value, [group.storeId]: '' };
 
@@ -378,7 +418,13 @@ async function placeStoreOrder(group: CartGroup): Promise<void> {
       quantity: item.quantity,
       unitPrice: item.unitPrice,
     }));
-    await placeOrder(buyerId, store.id, orderItems, addressDetails(address));
+    await placeOrder(
+      buyerId,
+      store.id,
+      orderItems,
+      fulfillmentType.value,
+      address ? addressDetails(address) : undefined,
+    );
     try {
       cart.removeItems(group.items.map((item) => item.productId));
       messageColor.value = 'success';
@@ -428,6 +474,12 @@ h1 {
   border-radius: 1rem;
   background: var(--ion-card-background);
   box-shadow: var(--app-shadow-soft);
+}
+
+.fulfillment-note {
+  margin: 0.65rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: 0.85rem;
 }
 
 .delivery-heading,
