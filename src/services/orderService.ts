@@ -91,7 +91,7 @@ export async function listBuyerOrders(buyerId: string): Promise<PetFoodOrder[]> 
   return result.docs.map(toPetFoodOrder).sort(sortOrdersByDate);
 }
 
-function toPetFoodOrder(snapshot: { id: string; data(): Record<string, unknown> }): PetFoodOrder {
+export function toPetFoodOrder(snapshot: { id: string; data(): Record<string, unknown> }): PetFoodOrder {
   return {
     id: snapshot.id,
     ...(snapshot.data() as Omit<PetFoodOrder, 'id'>),

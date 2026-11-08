@@ -6,8 +6,12 @@
         <div class="app-brand" slot="start">
           <img src="/petfood-logo.svg" alt="" />
           <div class="brand-copy">
-            <ion-title>{{ authStore.profile?.role === 'OWNER' ? 'My pet food store' : 'PetFood' }}</ion-title>
-            <span>{{ authStore.profile?.role === 'OWNER' ? 'OWNER SPACE' : 'PET PARENT' }}</span>
+            <ion-title>
+              {{ authStore.profile?.role === 'OWNER' ? 'My pet food store' : authStore.profile?.role === 'ADMIN' ? 'PetFood admin' : 'PetFood' }}
+            </ion-title>
+            <span>
+              {{ authStore.profile?.role === 'OWNER' ? 'OWNER SPACE' : authStore.profile?.role === 'ADMIN' ? 'ADMIN CONSOLE' : 'PET PARENT' }}
+            </span>
           </div>
         </div>
         <ion-buttons slot="end">
@@ -78,7 +82,7 @@
             <ion-label>Reports</ion-label>
           </ion-tab-button>
         </template>
-        <template v-else>
+        <template v-else-if="authStore.profile?.role === 'BUYER'">
           <ion-tab-button tab="home" href="/tabs/home">
             <ion-icon :icon="homeOutline" />
             <ion-label>Home</ion-label>
@@ -98,6 +102,12 @@
           <ion-tab-button tab="account" href="/tabs/account">
             <ion-icon :icon="personCircleOutline" />
             <ion-label>Account</ion-label>
+          </ion-tab-button>
+        </template>
+        <template v-else>
+          <ion-tab-button tab="admin" href="/tabs/admin">
+            <ion-icon :icon="personCircleOutline" />
+            <ion-label>Admin</ion-label>
           </ion-tab-button>
         </template>
       </ion-tab-bar>

@@ -17,7 +17,7 @@ import type { Product, Store } from '@/types';
 export type StoreInput = Omit<Store, 'id' | 'ownerId'>;
 export type ProductInput = Omit<Product, 'id' | 'storeId'>;
 
-function toStore(id: string, data: Record<string, unknown>): Store {
+export function toStore(id: string, data: Record<string, unknown>): Store {
   return {
     id,
     ownerId: String(data.ownerId ?? ''),
@@ -33,7 +33,7 @@ function toStore(id: string, data: Record<string, unknown>): Store {
   };
 }
 
-function toProduct(id: string, data: Record<string, unknown>): Product {
+export function toProduct(id: string, data: Record<string, unknown>): Product {
   return {
     id,
     storeId: String(data.storeId ?? ''),

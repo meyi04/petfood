@@ -11,6 +11,11 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'OWNER';
     }
 
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+    }
+
     function ownsStore(storeId) {
       return isOwner()
         && get(/databases/$(database)/documents/stores/$(storeId)).data.ownerId == request.auth.uid;
@@ -53,13 +58,18 @@ service cloud.firestore {
         && request.resource.data.email == request.auth.token.email
         && request.resource.data.role in ['OWNER', 'BUYER']
         && request.resource.data.displayName is string;
-      allow read: if signedIn() && request.auth.uid == userId;
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
       allow update: if signedIn()
-        && request.auth.uid == userId
-        && request.resource.data.uid == resource.data.uid
-        && request.resource.data.email == resource.data.email
-        && request.resource.data.role == resource.data.role
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']);
+        && (
+          (request.auth.uid == userId
+            && request.resource.data.uid == resource.data.uid
+            && request.resource.data.email == resource.data.email
+            && request.resource.data.role == resource.data.role
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']))
+          || (isAdmin()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
+            && request.resource.data.role in ['OWNER', 'BUYER', 'ADMIN'])
+        );
       allow delete: if false;
 
       match /deliveryAddresses/{addressId} {
@@ -84,7 +94,7 @@ service cloud.firestore {
         && request.resource.data.lng is number
         && request.resource.data.phone is string
         && request.resource.data.imageUrl is string;
-      allow delete: if isOwner() && resource.data.ownerId == request.auth.uid;
+      allow delete: if (isOwner() && resource.data.ownerId == request.auth.uid) || isAdmin();
     }
 
     match /directoryStores/{storeId} {
@@ -116,7 +126,7 @@ service cloud.firestore {
         && request.resource.data.description is string
         && request.resource.data.category is string
         && request.resource.data.imageUrl is string;
-      allow delete: if ownsStore(resource.data.storeId);
+      allow delete: if ownsStore(resource.data.storeId) || isAdmin();
     }
 
     match /orders/{orderId} {
@@ -135,9 +145,9 @@ service cloud.firestore {
         && request.resource.data.status == 'pending'
         && validDeliveryAddress(request.resource.data.deliveryAddress);
       allow read: if signedIn()
-        && (resource.data.buyerId == request.auth.uid || ownsStore(resource.data.storeId));
+        && (resource.data.buyerId == request.auth.uid || ownsStore(resource.data.storeId) || isAdmin());
       allow update: if signedIn()
-        && ownsStore(resource.data.storeId)
+        && (ownsStore(resource.data.storeId) || isAdmin())
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'status', 'confirmedAt', 'completedAt'
         ])

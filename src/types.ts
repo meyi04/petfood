@@ -1,7 +1,8 @@
 // src/types.ts
 import type { Timestamp } from 'firebase/firestore';
 
-export type UserRole = 'OWNER' | 'BUYER';
+export type UserRole = 'OWNER' | 'BUYER' | 'ADMIN';
+export type RegistrationRole = Exclude<UserRole, 'ADMIN'>;
 
 export interface UserProfile {
   uid: string;

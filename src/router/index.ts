@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import type { RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import type { UserRole } from '@/types';
+import { homeRouteForRole } from '@/utils/role';
 import TabsPage from '@/views/TabsPage.vue';
 
 declare module 'vue-router' {
@@ -31,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true },
     children: [
       { path: '', redirect: '/tabs/home' },
+      {
+        path: 'admin',
+        component: () => import('@/views/AdminPage.vue'),
+        meta: { roles: ['ADMIN'] },
+      },
       {
         path: 'home',
         component: () => import('@/views/HomePage.vue'),
@@ -121,7 +127,7 @@ router.beforeEach(async (to) => {
   await authStore.initialize();
 
   if (to.meta.guestOnly && authStore.profile) {
-    return authStore.profile.role === 'OWNER' ? '/tabs/owner' : '/tabs/home';
+    return homeRouteForRole(authStore.profile.role);
   }
 
   if (to.meta.requiresAuth && !authStore.profile) {
@@ -130,7 +136,7 @@ router.beforeEach(async (to) => {
 
   const permittedRoles = to.meta.roles;
   if (permittedRoles?.length && authStore.profile && !permittedRoles.includes(authStore.profile.role)) {
-    return authStore.profile.role === 'OWNER' ? '/tabs/owner' : '/tabs/home';
+    return homeRouteForRole(authStore.profile.role);
   }
 
   return true;

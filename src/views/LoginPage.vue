@@ -121,6 +121,7 @@ import {
   shieldCheckmarkOutline,
 } from 'ionicons/icons';
 import { useAuthStore } from '@/stores/auth';
+import { homeRouteForRole } from '@/utils/role';
 import ThemeToggleButton from '@/components/ThemeToggleButton.vue';
 
 const email = ref('');
@@ -135,7 +136,7 @@ async function submit(): Promise<void> {
   busy.value = true;
   try {
     await authStore.login(email.value, password.value);
-    await router.replace(authStore.profile?.role === 'OWNER' ? '/tabs/owner' : '/tabs/home');
+    await router.replace(homeRouteForRole(authStore.profile?.role));
   } catch (cause) {
     message.value = cause instanceof Error ? cause.message : 'Could not sign in.';
   } finally {

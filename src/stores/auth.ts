@@ -11,7 +11,7 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref } from 'vue';
 import { auth, db } from '@/firebase';
-import type { UserProfile, UserRole } from '@/types';
+import type { RegistrationRole, UserProfile } from '@/types';
 
 let authInitialization: Promise<void> | undefined;
 let resolveAuthInitialization: (() => void) | undefined;
@@ -57,7 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const data = snapshot.data();
-    if (data.role !== 'OWNER' && data.role !== 'BUYER') {
+    if (data.role !== 'OWNER' && data.role !== 'BUYER' && data.role !== 'ADMIN') {
       throw new Error('Your account has an invalid role. Please contact support.');
     }
 
@@ -73,7 +73,7 @@ export const useAuthStore = defineStore('auth', () => {
     email: string,
     password: string,
     displayName: string,
-    role: UserRole,
+    role: RegistrationRole,
   ): Promise<void> {
     error.value = null;
     const credential = await createUserWithEmailAndPassword(auth, email.trim(), password);

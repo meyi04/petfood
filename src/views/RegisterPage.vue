@@ -91,13 +91,14 @@ import {
   IonToolbar,
 } from '@ionic/vue';
 import { useAuthStore } from '@/stores/auth';
+import { homeRouteForRole } from '@/utils/role';
 import ThemeToggleButton from '@/components/ThemeToggleButton.vue';
-import type { UserRole } from '@/types';
+import type { RegistrationRole } from '@/types';
 
 const displayName = ref('');
 const email = ref('');
 const password = ref('');
-const role = ref<UserRole>('BUYER');
+const role = ref<RegistrationRole>('BUYER');
 const busy = ref(false);
 const message = ref('');
 const alreadyRegistered = ref(false);
@@ -110,7 +111,7 @@ async function submit(): Promise<void> {
   alreadyRegistered.value = false;
   try {
     await authStore.register(email.value, password.value, displayName.value, role.value);
-    await router.replace(role.value === 'OWNER' ? '/tabs/owner' : '/tabs/home');
+    await router.replace(homeRouteForRole(role.value));
   } catch (cause) {
     const code =
       cause instanceof Error && 'code' in cause && typeof cause.code === 'string'
