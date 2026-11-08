@@ -4,9 +4,9 @@
       <ion-toolbar>
         <ion-title>Sales reports</ion-title>
         <ion-buttons slot="end">
-          <ion-button :disabled="loading || !salesOrders.length" @click="downloadReport">
+          <ion-button :disabled="loading || !store" @click="downloadReport">
             <ion-icon slot="start" :icon="downloadOutline" />
-            Export
+            Download PDF
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -36,6 +36,21 @@
             <strong>{{ store.name }}</strong>
             <small>{{ store.address }}, {{ store.municipality }} · {{ store.phone }}</small>
           </div>
+        </section>
+
+        <section class="download-panel" aria-label="Download sales report">
+          <div>
+            <strong>Take your shop report with you</strong>
+            <p>Download sales totals, best-selling products, and order details as a PDF file.</p>
+          </div>
+          <ion-button
+            class="download-report-button"
+            :disabled="!store"
+            @click="downloadReport"
+          >
+            <ion-icon slot="start" :icon="downloadOutline" />
+            Download PDF report
+          </ion-button>
         </section>
 
         <section class="metric-grid">
@@ -122,6 +137,7 @@ import {
   onIonViewWillEnter,
 } from '@ionic/vue';
 import { barChartOutline, downloadOutline } from 'ionicons/icons';
+import { jsPDF } from 'jspdf';
 import { listStoreOrders } from '@/services/orderService';
 import { getOwnerStore } from '@/services/storeService';
 import { useAuthStore } from '@/stores/auth';
@@ -211,55 +227,177 @@ async function loadOrders(): Promise<void> {
   }
 }
 
-function csvCell(value: string | number): string {
-  const text = String(value).replace(/^[=+\-@]/, "'$&");
-  return `"${text.replace(/"/g, '""')}"`;
-}
-
 function downloadReport(): void {
   if (!store.value) return;
-  const rows: Array<Array<string | number>> = [
-    ['Shop', store.value.name],
-    ['Address', `${store.value.address}, ${store.value.municipality}`],
-    ['Phone', store.value.phone],
-    ['Owner', authStore.profile?.displayName ?? ''],
-    ['Report generated', new Date().toLocaleString()],
-    [],
-    ['Sales summary'],
-    ['Period', periodLabel.value],
-    ['Total sales', totalSales.value.toFixed(2)],
-    ['Confirmed orders', salesOrders.value.length],
-    ['Items sold', itemsSold.value],
-    ['Average order', averageOrder.value.toFixed(2)],
-    [],
-    ['Best-selling products'],
-    ['Product', 'Quantity sold', 'Sales'],
-    ...topProducts.value.map((product) => [
-      product.name,
-      product.quantity,
-      product.sales.toFixed(2),
-    ]),
-    [],
-    ['Order details'],
-    ['Order ID', 'Sale date', 'Status', 'Items', 'Total'],
-    ...salesOrders.value.map((order) => [
-      order.id,
-      (order.confirmedAt ?? order.completedAt ?? order.createdAt)?.toDate?.().toLocaleString() ?? '',
-      order.status,
-      order.items.map((item) => `${item.quantity} x ${item.name}`).join('; '),
-      order.total.toFixed(2),
-    ]),
+  const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentWidth = pageWidth - margin * 2;
+  const pageBottom = pageHeight - margin;
+  let y = margin;
+
+  function drawPageHeader(): void {
+    pdf.setFillColor(25, 117, 104);
+    pdf.rect(0, 0, pageWidth, 4, 'F');
+    pdf.setTextColor(25, 117, 104);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.text(store.value?.name ?? 'Shop', margin, 15);
+    pdf.setTextColor(80, 90, 90);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.text('SALES REPORT', pageWidth - margin, 14, { align: 'right' });
+    pdf.text(`${periodLabel.value} · Generated ${new Date().toLocaleDateString()}`, margin, 21);
+    y = 30;
+  }
+
+  function ensureSpace(height: number): void {
+    if (y + height <= pageBottom) return;
+    pdf.addPage();
+    drawPageHeader();
+  }
+
+  function drawSectionTitle(title: string): void {
+    ensureSpace(13);
+    y += 3;
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(11);
+    pdf.setTextColor(25, 117, 104);
+    pdf.text(title, margin, y);
+    y += 3;
+    pdf.setDrawColor(220, 228, 226);
+    pdf.line(margin, y, pageWidth - margin, y);
+    y += 6;
+  }
+
+  function drawTextLines(lines: string[], x: number, lineHeight: number): void {
+    pdf.text(lines, x, y);
+    y += lines.length * lineHeight;
+  }
+
+  drawPageHeader();
+  pdf.setTextColor(70, 76, 76);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(9);
+  const shopDetails = [
+    `${store.value.address}, ${store.value.municipality}`,
+    store.value.phone ? `Phone: ${store.value.phone}` : '',
+    authStore.profile?.displayName ? `Prepared for ${authStore.profile.displayName}` : '',
+  ].filter(Boolean);
+  for (const detail of shopDetails) {
+    const lines = pdf.splitTextToSize(detail, contentWidth);
+    ensureSpace(lines.length * 5);
+    drawTextLines(lines, margin, 5);
+  }
+
+  drawSectionTitle('Sales summary');
+  const summary = [
+    ['Total sales', formatCurrency(totalSales.value)],
+    ['Confirmed orders', String(salesOrders.value.length)],
+    ['Items sold', String(itemsSold.value)],
+    ['Average order', formatCurrency(averageOrder.value)],
   ];
-  const csv = `\uFEFF${rows.map((row) => row.map(csvCell).join(',')).join('\r\n')}`;
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  const anchor = document.createElement('a');
-  anchor.href = url;
+  const cardGap = 4;
+  const cardWidth = (contentWidth - cardGap * 3) / 4;
+  const cardHeight = 19;
+  ensureSpace(cardHeight + 4);
+  summary.forEach(([label, value], index) => {
+    const x = margin + index * (cardWidth + cardGap);
+    pdf.setFillColor(244, 248, 247);
+    pdf.roundedRect(x, y, cardWidth, cardHeight, 2, 2, 'F');
+    pdf.setTextColor(90, 100, 98);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(7);
+    pdf.text(label, x + 3, y + 6);
+    pdf.setTextColor(35, 44, 43);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(9);
+    pdf.text(pdf.splitTextToSize(value, cardWidth - 6), x + 3, y + 13);
+  });
+  y += cardHeight + 5;
+
+  drawSectionTitle('Best-selling products');
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(8);
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFillColor(25, 117, 104);
+  pdf.rect(margin, y - 4, contentWidth, 8, 'F');
+  pdf.text('Product', margin + 2, y + 1);
+  pdf.text('Qty sold', pageWidth - margin - 42, y + 1, { align: 'right' });
+  pdf.text('Sales', pageWidth - margin - 2, y + 1, { align: 'right' });
+  y += 9;
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(50, 56, 55);
+  if (!topProducts.value.length) {
+    ensureSpace(7);
+    pdf.text('No confirmed product sales in this period.', margin + 2, y);
+    y += 7;
+  } else {
+    for (const product of topProducts.value) {
+      const nameLines = pdf.splitTextToSize(product.name, contentWidth - 70);
+      const rowHeight = Math.max(7, nameLines.length * 4.5);
+      ensureSpace(rowHeight);
+      pdf.text(nameLines, margin + 2, y);
+      pdf.text(String(product.quantity), pageWidth - margin - 42, y, { align: 'right' });
+      pdf.text(formatCurrency(product.sales), pageWidth - margin - 2, y, { align: 'right' });
+      y += rowHeight;
+      pdf.setDrawColor(235, 239, 238);
+      pdf.line(margin, y - 1, pageWidth - margin, y - 1);
+    }
+  }
+
+  drawSectionTitle('Order details');
+  if (!salesOrders.value.length) {
+    ensureSpace(7);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(70, 76, 76);
+    pdf.text('No confirmed orders in this period.', margin, y);
+    y += 7;
+  } else {
+    for (const order of salesOrders.value) {
+      const saleDate = (order.confirmedAt ?? order.completedAt ?? order.createdAt)
+        ?.toDate?.().toLocaleDateString() ?? 'Date unavailable';
+      const itemLines = pdf.splitTextToSize(
+        order.items.map((item) => `${item.quantity} x ${item.name}`).join(' · '),
+        contentWidth - 4,
+      );
+      const blockHeight = 12 + itemLines.length * 4.5;
+      ensureSpace(blockHeight);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.setTextColor(40, 48, 47);
+      pdf.text(`Order #${order.id.slice(0, 8).toUpperCase()} · ${saleDate} · ${order.status}`, margin, y);
+      pdf.text(formatCurrency(order.total), pageWidth - margin, y, { align: 'right' });
+      y += 5;
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(90, 96, 95);
+      pdf.setFontSize(8);
+      pdf.text(itemLines, margin + 2, y);
+      y += itemLines.length * 4.5 + 3;
+      pdf.setDrawColor(235, 239, 238);
+      pdf.line(margin, y, pageWidth - margin, y);
+      y += 4;
+    }
+  }
+
+  const pageCount = pdf.getNumberOfPages();
+  for (let page = 1; page <= pageCount; page += 1) {
+    pdf.setPage(page);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+    pdf.setTextColor(125, 132, 131);
+    pdf.text(
+      `${store.value.name} · ${periodLabel.value}`,
+      margin,
+      pageHeight - 7,
+    );
+    pdf.text(`Page ${page} of ${pageCount}`, pageWidth - margin, pageHeight - 7, { align: 'right' });
+  }
+
   const shopSlug = store.value.name.toLocaleLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'shop';
-  anchor.download = `${shopSlug}-sales-report-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.append(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
+  pdf.save(`${shopSlug}-sales-report-${new Date().toISOString().slice(0, 10)}.pdf`);
 }
 
 onIonViewWillEnter(loadOrders);
@@ -335,6 +473,33 @@ h1 {
   overflow-wrap: anywhere;
   color: var(--ion-color-medium);
   font-size: 0.7rem;
+}
+
+.download-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+  padding: 1rem;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 0.9rem;
+  background: var(--ion-card-background);
+}
+
+.download-panel strong {
+  font-size: 0.9rem;
+}
+
+.download-panel p {
+  margin: 0.3rem 0 0;
+  color: var(--ion-color-medium);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.download-report-button {
+  flex: none;
 }
 
 .report-heading ion-select {
@@ -502,6 +667,18 @@ h1 {
 @media (min-width: 680px) {
   .metric-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .download-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .download-report-button {
+    width: 100%;
+    margin: 0;
   }
 }
 </style>
